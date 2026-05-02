@@ -40,6 +40,11 @@ public class BattleManager : MonoBehaviour
     int MaxComboNum = 5;
     List<Skill> combo = new List<Skill>();
 
+    List<Skill> currentChoices = new List<Skill>();
+    public int choiceCount = 5;
+    public GameObject skillButtonPrefab;
+    public Transform skillButtonParent;
+
     class SPComboData
     {
         public string name;
@@ -142,6 +147,9 @@ public class BattleManager : MonoBehaviour
 
         state = GameState.Selecting;
         selectTimer = selectTimeLimit;
+
+        GenerateChoices();
+        GenerateSkillButtons();
         
         UpdateUI();
     }
@@ -154,7 +162,7 @@ public class BattleManager : MonoBehaviour
             errorText.text = "do not select skills over this" ;
             return;
         }
-        combo.Add(skills[index]);
+        combo.Add(currentChoices[index]);
         UpdateUI();
     }
 
@@ -206,6 +214,49 @@ public class BattleManager : MonoBehaviour
         ConfirmSelection();
     }
 
+    void GenerateChoices()
+    {
+        currentChoices.Clear();
+
+        List<Skill> pool = new List<Skill>(skills);
+
+        for (int i = 0; i < choiceCount; i++)
+        {
+            if (pool.Count == 0) break;
+
+            int rand = Random.Range(0, pool.Count);
+            currentChoices.Add(pool[rand]);
+            pool.RemoveAt(rand);
+        }
+    }
+
+    void GenerateSkillButtons()
+    {
+        // 既存ボタン削除
+        foreach (Transform child in skillButtonParent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // 新規生成
+        for (int i = 0; i < currentChoices.Count; i++)
+        {
+            int index = i;
+
+            GameObject btn = Instantiate(skillButtonPrefab, skillButtonParent);
+
+            // テキスト設定
+            var text = btn.GetComponentInChildren<TextMeshProUGUI>();
+            text.text = currentChoices[i].name;
+
+            // ボタンイベント設定
+            btn.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
+            {
+                SelectSkill(index);
+            });
+        }
+    }
+
     void ExecuteAction()
     {
         if(state != GameState.Executing) return;
@@ -226,6 +277,9 @@ public class BattleManager : MonoBehaviour
         UpdateUI();
         state = GameState.Selecting;
         selectTimer = selectTimeLimit;
+
+        GenerateChoices();
+        GenerateSkillButtons();
     }
 
     void FinishGame()
