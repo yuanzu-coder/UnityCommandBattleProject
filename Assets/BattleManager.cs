@@ -32,8 +32,9 @@ public class BattleManager : MonoBehaviour
         public string name;
         public int damage;
     }
-    Skill attack;
-    Skill fire;
+    Skill attack, fire, ice, wind, 
+          volcano, blizzard, hurricane,
+          explosion, fleeze, tornado;
     List<Skill> skills = new List<Skill>();
 
     int MaxComboNum = 5;
@@ -61,10 +62,21 @@ public class BattleManager : MonoBehaviour
         //Skillの宣言
         attack = new Skill { name = "Attack", damage = 10};
         fire = new Skill { name = "Fire", damage = 20};
+        ice = new Skill { name = "Ice", damage = 20};
+        wind = new Skill { name = "Wind", damage = 20};
+        volcano = new Skill { name = "Volcano", damage = 40};
+        blizzard = new Skill { name = "Blizzard", damage = 40};
+        hurricane = new Skill { name = "Hurricane", damage = 40};
+        explosion = new Skill { name = "Explosion", damage = 70};
+        fleeze = new Skill { name = "Fleeze", damage = 70};
+        tornado = new Skill { name = "Tornado", damage = 70};
+
 
         skills = new List<Skill>()
         {
-            attack, fire
+            attack, fire, ice, wind, 
+            volcano, blizzard, hurricane,
+            explosion, fleeze, tornado
         };
 
         SPcomboList = new List<SPComboData>()
