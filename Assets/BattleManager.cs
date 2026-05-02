@@ -16,7 +16,7 @@ public class BattleManager : MonoBehaviour
     int MaxEnemyHP = 500;
     public int enemyHP;
     public int finalScore;
-    public int sumDamge;
+    public int sumDamage;
 
     public TextMeshProUGUI enemyText;
     public TextMeshProUGUI selectedSkillsText;
@@ -35,7 +35,7 @@ public class BattleManager : MonoBehaviour
     }
     Skill attack, fire, ice, wind, 
           volcano, blizzard, hurricane,
-          explosion, fleeze, tornado;
+          explosion, freeze, tornado;
     List<Skill> skills = new List<Skill>();
 
     int MaxComboNum = 5;
@@ -75,7 +75,7 @@ public class BattleManager : MonoBehaviour
         blizzard = new Skill { name = "Blizzard", damage = 40};
         hurricane = new Skill { name = "Hurricane", damage = 40};
         explosion = new Skill { name = "Explosion", damage = 70};
-        fleeze = new Skill { name = "Fleeze", damage = 70};
+        freeze = new Skill { name = "Freeze", damage = 70};
         tornado = new Skill { name = "Tornado", damage = 70};
 
 
@@ -83,7 +83,7 @@ public class BattleManager : MonoBehaviour
         {
             attack, fire, ice, wind, 
             volcano, blizzard, hurricane,
-            explosion, fleeze, tornado
+            explosion, freeze, tornado
         };
 
         SPcomboList = new List<SPComboData>()
@@ -139,7 +139,7 @@ public class BattleManager : MonoBehaviour
     {
         enemyHP = MaxEnemyHP;
         finalScore = 0;
-        sumDamge = 0;
+        sumDamage = 0;
 
         nextChoiceText.text = "";
         damageText.text = "";
@@ -236,7 +236,14 @@ public class BattleManager : MonoBehaviour
             pool.RemoveAt(rand);
         }
 
-        nextChoice = pool[Random.Range(0, pool.Count)];
+        if (pool.Count > 0)
+        {
+            nextChoice = pool[Random.Range(0, pool.Count)];
+        }
+        else
+        {
+            nextChoice = null;
+        }
     }
 
     void GenerateSkillButtons()
@@ -270,21 +277,28 @@ public class BattleManager : MonoBehaviour
 
     void RefillChoices()
     {
-        List<Skill> pool = new List<Skill>(skills);
+        List<Skill> pool = skills.Except(currentChoices).ToList();
 
         int rand = Random.Range(0, pool.Count);
         currentChoices.Add(pool[rand]);
         pool.RemoveAt(rand);
 
-        nextChoice = pool[Random.Range(0, pool.Count)];
+        if (pool.Count > 0)
+        {
+            nextChoice = pool[Random.Range(0, pool.Count)];
+        }
+        else
+        {
+            nextChoice = null;
+        }
     }
 
     void ExecuteAction()
     {
         if(state != GameState.Executing) return;
 
-        sumDamge = CalculateDamage();
-        enemyHP -= sumDamge;
+        sumDamage = CalculateDamage();
+        enemyHP -= sumDamage;
         combo.Clear();
 
         if(enemyHP <= 0)
@@ -383,8 +397,7 @@ public class BattleManager : MonoBehaviour
 
         if (state == GameState.Selecting)
         {
-            if (combo.Count == 0) ;
-            else errorText.text = "";
+            if (combo.Count != 0) errorText.text = "";
         }
         else
         {
@@ -393,7 +406,7 @@ public class BattleManager : MonoBehaviour
 
         if (state == GameState.Executing)
         {
-            damageText.text = sumDamge + " damge";
+            damageText.text = sumDamage + " damage";
         }
         else
         {
