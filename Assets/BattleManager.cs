@@ -21,6 +21,7 @@ public class BattleManager : MonoBehaviour
     public TextMeshProUGUI enemyText;
     public TextMeshProUGUI selectedSkillsText;
     public TextMeshProUGUI comboNumText;
+    public TextMeshProUGUI nextChoiceText;
     public TextMeshProUGUI selectTimerText;
     public TextMeshProUGUI battleTimerText;
     public TextMeshProUGUI damageText;
@@ -140,6 +141,7 @@ public class BattleManager : MonoBehaviour
         finalScore = 0;
         sumDamge = 0;
 
+        nextChoiceText.text = "";
         damageText.text = "";
         errorText.text = "";
         resultText.text = "";
@@ -233,6 +235,8 @@ public class BattleManager : MonoBehaviour
             currentChoices.Add(pool[rand]);
             pool.RemoveAt(rand);
         }
+
+        nextChoice = pool[Random.Range(0, pool.Count)];
     }
 
     void GenerateSkillButtons()
@@ -260,12 +264,19 @@ public class BattleManager : MonoBehaviour
                 SelectSkill(index);
             });
         }
+
+        nextChoiceText.text = nextChoice.name;
     }
 
     void RefillChoices()
     {
-        int rand = Random.Range(0, skills.Count);
-        currentChoices.Add(skills[rand]);
+        List<Skill> pool = new List<Skill>(skills);
+
+        int rand = Random.Range(0, pool.Count);
+        currentChoices.Add(pool[rand]);
+        pool.RemoveAt(rand);
+
+        nextChoice = pool[Random.Range(0, pool.Count)];
     }
 
     void ExecuteAction()
