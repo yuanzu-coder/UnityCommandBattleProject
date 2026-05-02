@@ -41,6 +41,7 @@ public class BattleManager : MonoBehaviour
     List<Skill> combo = new List<Skill>();
 
     List<Skill> currentChoices = new List<Skill>();
+    Skill nextChoice;
     public int choiceCount = 5;
     public GameObject skillButtonPrefab;
     public Transform skillButtonParent;
@@ -163,6 +164,10 @@ public class BattleManager : MonoBehaviour
             return;
         }
         combo.Add(currentChoices[index]);
+        currentChoices.RemoveAt(index);
+        RefillChoices();
+        GenerateSkillButtons();
+
         UpdateUI();
     }
 
@@ -255,6 +260,12 @@ public class BattleManager : MonoBehaviour
                 SelectSkill(index);
             });
         }
+    }
+
+    void RefillChoices()
+    {
+        int rand = Random.Range(0, skills.Count);
+        currentChoices.Add(skills[rand]);
     }
 
     void ExecuteAction()
