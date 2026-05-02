@@ -47,11 +47,6 @@ public class BattleManager : MonoBehaviour
     }
     List<SPComboData> SPcomboList = new List<SPComboData>();
 
-    public enum SkillID
-    {
-        Attack, Fire
-    }
-
     public enum GameState
     {
         Selecting,
