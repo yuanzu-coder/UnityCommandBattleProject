@@ -13,7 +13,7 @@ public class BattleManager : MonoBehaviour
     float battleTimer;
     float finalbattleTimer;
 
-    int MaxEnemyHP = 500;
+    int MaxEnemyHP = 1000;
     public int enemyHP;
     public int finalScore;
     public int sumDamage;
@@ -34,11 +34,17 @@ public class BattleManager : MonoBehaviour
     {
         public string name;
         public int damage;
+        public ElementType element;
     }
     Skill attack, fire, ice, wind, 
           volcano, blizzard, hurricane,
           explosion, freeze, tornado;
     List<Skill> skills = new List<Skill>();
+
+    public enum ElementType
+    {
+        normal, fire, ice, wind
+    }
 
     int MaxComboNum = 5;
     List<Skill> combo = new List<Skill>();
@@ -69,16 +75,16 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         //Skillの宣言
-        attack = new Skill { name = "Attack", damage = 10};
-        fire = new Skill { name = "Fire", damage = 20};
-        ice = new Skill { name = "Ice", damage = 20};
-        wind = new Skill { name = "Wind", damage = 20};
-        volcano = new Skill { name = "Volcano", damage = 40};
-        blizzard = new Skill { name = "Blizzard", damage = 40};
-        hurricane = new Skill { name = "Hurricane", damage = 40};
-        explosion = new Skill { name = "Explosion", damage = 70};
-        freeze = new Skill { name = "Freeze", damage = 70};
-        tornado = new Skill { name = "Tornado", damage = 70};
+        attack = new Skill { name = "Attack", damage = 10, element = ElementType.normal };
+        fire = new Skill { name = "Fire", damage = 20, element = ElementType.fire };
+        ice = new Skill { name = "Ice", damage = 20, element = ElementType.ice };
+        wind = new Skill { name = "Wind", damage = 20, element = ElementType.wind };
+        volcano = new Skill { name = "Volcano", damage = 40, element = ElementType.fire };
+        blizzard = new Skill { name = "Blizzard", damage = 40, element = ElementType.ice };
+        hurricane = new Skill { name = "Hurricane", damage = 40, element = ElementType.wind };
+        explosion = new Skill { name = "Explosion", damage = 70, element = ElementType.fire };
+        freeze = new Skill { name = "Freeze", damage = 70, element = ElementType.ice };
+        tornado = new Skill { name = "Tornado", damage = 70, element = ElementType.wind };
 
 
         skills = new List<Skill>()
