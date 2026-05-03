@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 9167574}
   - component: {fileID: 9167573}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ResetButtonText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -176,7 +176,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Reset
+  m_text: RESET
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -348,7 +348,7 @@ GameObject:
   - component: {fileID: 162272087}
   - component: {fileID: 162272086}
   m_Layer: 5
-  m_Name: DeletComboButton
+  m_Name: DeletChordButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1112,7 +1112,7 @@ GameObject:
   - component: {fileID: 984558536}
   - component: {fileID: 984558535}
   m_Layer: 5
-  m_Name: SkillsListText
+  m_Name: ChordListText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1134,8 +1134,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 443.84, y: -136.4}
-  m_SizeDelta: {x: 137.67, y: 26.101}
+  m_AnchoredPosition: {x: 508.48, y: -136.4}
+  m_SizeDelta: {x: 151.3691, y: 26.101}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &984558535
 MonoBehaviour:
@@ -1157,7 +1157,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Selected Skill:'
+  m_text: 'Selected Chord:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1250,7 +1250,7 @@ GameObject:
   - component: {fileID: 1078943373}
   - component: {fileID: 1078943372}
   m_Layer: 5
-  m_Name: ActionButton
+  m_Name: PlayButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1382,7 +1382,7 @@ GameObject:
   - component: {fileID: 1132719739}
   - component: {fileID: 1132719740}
   m_Layer: 5
-  m_Name: ComboNumText
+  m_Name: SelectedChordsNumText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1404,8 +1404,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 577.91, y: -136.4}
-  m_SizeDelta: {x: 130.4757, y: 26.101}
+  m_AnchoredPosition: {x: 649.4, y: -136.4}
+  m_SizeDelta: {x: 130.47, y: 26.101}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1132719739
 CanvasRenderer:
@@ -1656,7 +1656,7 @@ GameObject:
   - component: {fileID: 1161165194}
   - component: {fileID: 1161165193}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: DeleteButtonText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1701,7 +1701,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Delete
+  m_text: DELETE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1815,7 +1815,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 428.16, y: -211}
+  m_AnchoredPosition: {x: 505.64, y: -199}
   m_SizeDelta: {x: 145.6842, y: 80.4169}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1271751135
@@ -2477,7 +2477,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 608, y: -352}
+  m_AnchoredPosition: {x: 559.45, y: -392}
   m_SizeDelta: {x: 137.67, y: 26.101}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1700793612
@@ -2615,7 +2615,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 274, y: -375.12}
+  m_AnchoredPosition: {x: 214, y: -375.12}
   m_SizeDelta: {x: -1003, y: -840}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1710367289
@@ -2693,7 +2693,7 @@ GameObject:
   - component: {fileID: 1732576737}
   - component: {fileID: 1732576736}
   m_Layer: 5
-  m_Name: ResetComboButton
+  m_Name: ResetProgressionButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2847,7 +2847,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 641.99, y: -388}
+  m_AnchoredPosition: {x: 620.81, y: -426}
   m_SizeDelta: {x: 187.6407, y: 28.05}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1738623630
@@ -2962,7 +2962,7 @@ GameObject:
   - component: {fileID: 1799096796}
   - component: {fileID: 1799096795}
   m_Layer: 5
-  m_Name: SelectedSkillsText
+  m_Name: SelectedChordText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3084,8 +3084,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 624.0848, y: -210.5415}
-  m_SizeDelta: {x: 222.8127, y: 122.1782}
+  m_AnchoredPosition: {x: 649.4, y: -250.48}
+  m_SizeDelta: {x: 130.47, y: 202.05}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1832586690
 GameObject:
@@ -3122,18 +3122,19 @@ MonoBehaviour:
   finalScore: 0
   sumDamage: 0
   enemyText: {fileID: 1157763257}
-  selectedSkillsText: {fileID: 1799096795}
-  comboNumText: {fileID: 1132719740}
+  selectedChordsText: {fileID: 1799096795}
+  progressionNumText: {fileID: 1132719740}
   nextChoiceText: {fileID: 1738623631}
   selectTimerText: {fileID: 1271751136}
   battleTimerText: {fileID: 951041933}
   damageText: {fileID: 1909247267}
   errorText: {fileID: 1674286761}
   resultText: {fileID: 719093447}
+  usedProgression: {fileID: 0}
   confirmButton: {fileID: 1078943372}
   choiceCount: 5
-  codeButtonPrefab: {fileID: 4384153888382200190, guid: c0df041a6cf014a76a8bd7ae4ff73b71, type: 3}
-  codeButtonParent: {fileID: 1710367288}
+  chordButtonPrefab: {fileID: 4384153888382200190, guid: c0df041a6cf014a76a8bd7ae4ff73b71, type: 3}
+  chordButtonParent: {fileID: 1710367288}
 --- !u!4 &1832586692
 Transform:
   m_ObjectHideFlags: 0
@@ -3431,7 +3432,7 @@ GameObject:
   - component: {fileID: 2140076296}
   - component: {fileID: 2140076295}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: PlayButtonText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3476,7 +3477,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Acction
+  m_text: PLAY
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

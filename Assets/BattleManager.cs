@@ -6,15 +6,17 @@ using System.Linq;
 
 public class BattleManager : MonoBehaviour
 {
-    public float selectTimeLimit = 10f;
+    public float selectTimeLimit = 8f;
     float selectTimer;
 
-    public float battleTimeLimit = 100f;
+    public float battleTimeLimit = 64f;
     float battleTimer;
-    float finalbattleTimer;
 
-    int MaxEnemyHP = 500;
+    int MaxEnemyHP = 1000;
     public int enemyHP;
+    public int SPProgressionCounter;
+    public int FProgressionCounter;
+    public int ProgressionBonus;
     public int finalScore;
     public int sumDamage;
 
@@ -27,6 +29,7 @@ public class BattleManager : MonoBehaviour
     public TextMeshProUGUI damageText;
     public TextMeshProUGUI errorText;
     public TextMeshProUGUI resultText;
+    public TextMeshProUGUI ModifierText;
 
     public UnityEngine.UI.Button confirmButton;
     
@@ -44,7 +47,7 @@ public class BattleManager : MonoBehaviour
         T, D, SD
     }
 
-    int MaxProgressionNum = 5;
+    int MaxProgressionNum = 8;
     List<Chord> progression = new List<Chord>();
 
     List<Chord> currentChoices = new List<Chord>();
@@ -68,6 +71,8 @@ public class BattleManager : MonoBehaviour
         public int damage; 
     }
     List<FProgressionData> FProgressionList = new List<FProgressionData>();
+
+    string Modifier = "";
 
     public enum GameState
     {
@@ -224,11 +229,15 @@ public class BattleManager : MonoBehaviour
     public void InitGame()
     {
         enemyHP = MaxEnemyHP;
+        SPProgressionCounter = 0;
+        FProgressionCounter = 0;
+        ProgressionBonus = 0;
         finalScore = 0;
         sumDamage = 0;
 
         nextChoiceText.text = "";
         damageText.text = "";
+        ModifierText.text = "";
         errorText.text = "";
         resultText.text = "";
 
@@ -410,6 +419,9 @@ public class BattleManager : MonoBehaviour
         sumDamage = CalculateDamage();
         enemyHP -= sumDamage;
         progression.Clear();
+        UpdateUI();
+        
+        Debug.Log("Bonus" + ProgressionBonus);
 
         if(enemyHP <= 0)
         {
@@ -420,9 +432,12 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        UpdateUI();
         state = GameState.Selecting;
         selectTimer = selectTimeLimit;
+        Modifier = "";
+        SPProgressionCounter = 0;
+        FProgressionCounter = 0;
+
 
         GenerateChoices();
         GenerateChordButtons();
@@ -490,25 +505,35 @@ public class BattleManager : MonoBehaviour
         {
             if (MatchSPProgression(c.pattern))
             {
-                damage += CalculateSPProgressionModifier(c);
-                Debug.Log("SP Progression: " + c.name);
+                Debug.Log("SP: " + c.name);
+                int CalcResult = CalculateSPProgressionModifier(c);
+                damage += CalcResult;
+                Modifier += $"SP: {c.name} (+{CalcResult})\n";
+                SPProgressionCounter++;
             }
         }
 
-        foreach (var c in FProgressionList)
+        if(SPProgressionCounter == 0)
         {
-            if (MatchFProgression(c.pattern))
+            foreach (var c in FProgressionList)
             {
-                damage += c.damage;
-                Debug.Log("E Progression: " + c.name);
+                if (MatchFProgression(c.pattern))
+                {
+                    Debug.Log("E : " + c.name);
+                    damage += c.damage;
+                    Modifier += $"E : {c.name} (+{c.damage})\n";
+                    FProgressionCounter++;
+                }
             }
         }
+        
 
         foreach (var chord in progression)
         {
             damage += chord.damage;
         }
 
+        ProgressionBonus += 3 * SPProgressionCounter + FProgressionCounter;
         return damage;
     }
     int CalculateSPProgressionModifier(SPProgressionData c)
@@ -524,8 +549,10 @@ public class BattleManager : MonoBehaviour
         float hpRatio = (float)(MaxEnemyHP - enemyHP) / MaxEnemyHP;
         float timeRatio = battleTimer / battleTimeLimit;
         float score = hpRatio * timeRatio;
+        score *= 10000;
+        score += ProgressionBonus * 100;
 
-        return Mathf.RoundToInt(score * 10000);
+        return Mathf.RoundToInt(score);
     }
 
     void UpdateUI()
@@ -551,6 +578,7 @@ public class BattleManager : MonoBehaviour
         if (state == GameState.Selecting)
         {
             if (progression.Count != 0) errorText.text = "";
+            
         }
         else
         {
@@ -560,10 +588,7 @@ public class BattleManager : MonoBehaviour
         if (state == GameState.Executing)
         {
             damageText.text = sumDamage + " damage";
-        }
-        else
-        {
-            damageText.text = "";
+            if (Modifier != "") ModifierText.text = "ProgressionBornus\n" + Modifier;
         }
 
         if (state == GameState.Result)
