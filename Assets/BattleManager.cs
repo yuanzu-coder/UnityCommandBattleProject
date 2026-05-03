@@ -13,7 +13,7 @@ public class BattleManager : MonoBehaviour
     float battleTimer;
     float finalbattleTimer;
 
-    int MaxEnemyHP = 1000;
+    int MaxEnemyHP = 500;
     public int enemyHP;
     public int finalScore;
     public int sumDamage;
@@ -36,14 +36,12 @@ public class BattleManager : MonoBehaviour
         public int damage;
         public ChordFunction element;
     }
-    Chord attack, fire, ice, wind, 
-          volcano, blizzard, hurricane,
-          explosion, freeze, tornado;
+    Chord C, Dm, Em, F, G, Am, Bdim;
     List<Chord> chords = new List<Chord>();
 
     public enum ChordFunction
     {
-        normal, fire, ice, wind
+        T, D, SD
     }
 
     int MaxProgressionNum = 5;
@@ -83,70 +81,107 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         //Chordの宣言
-        attack = new Chord { name = "Attack", damage = 10, element = ChordFunction.normal };
-        fire = new Chord { name = "Fire", damage = 20, element = ChordFunction.fire };
-        ice = new Chord { name = "Ice", damage = 20, element = ChordFunction.ice };
-        wind = new Chord { name = "Wind", damage = 20, element = ChordFunction.wind };
-        volcano = new Chord { name = "Volcano", damage = 40, element = ChordFunction.fire };
-        blizzard = new Chord { name = "Blizzard", damage = 40, element = ChordFunction.ice };
-        hurricane = new Chord { name = "Hurricane", damage = 40, element = ChordFunction.wind };
-        explosion = new Chord { name = "Explosion", damage = 70, element = ChordFunction.fire };
-        freeze = new Chord { name = "Freeze", damage = 70, element = ChordFunction.ice };
-        tornado = new Chord { name = "Tornado", damage = 70, element = ChordFunction.wind };
+        C = new Chord { name = "C", damage = 20, element = ChordFunction.T };
+        Dm= new Chord { name = "Dm", damage = 20, element = ChordFunction.SD };
+        Em = new Chord { name = "Em", damage = 20, element = ChordFunction.D };
+        F = new Chord { name = "F", damage = 20, element = ChordFunction.SD };
+        G = new Chord { name = "G", damage = 20, element = ChordFunction.D };
+        Am = new Chord { name = "Am", damage = 20, element = ChordFunction.T };
+        Bdim = new Chord { name = "Bm(-5)", damage = 20, element = ChordFunction.SD };
 
 
         chords = new List<Chord>()
         {
-            attack, fire, ice, wind, 
-            volcano, blizzard, hurricane,
-            explosion, freeze, tornado
+            C, Dm, Em, F, G, Am, Bdim
         };
 
         SPprogressionList = new List<SPProgressionData>()
         {
             new SPProgressionData
             {
-                name = "HotWind",
-                pattern = new [] { fire, wind },
+                name = "Canon Progression",
+                pattern = new [] { C, G, Am, Em },
+                multiplier = 3
+            },
+            new SPProgressionData
+            {
+                name = "Only-one Progression",
+                pattern = new [] { C, F, G, Em },
+                multiplier = 3
+            },
+            new SPProgressionData
+            {
+                name = "Ascending Prpgression (from Dm)",
+                pattern = new [] { Dm, Em, F, G },
+                multiplier = 3
+            },
+            new SPProgressionData
+            {
+                name = "Royal-Road Progression",
+                pattern = new [] { F, G, Em, Am },
+                multiplier = 3
+            },
+            new SPProgressionData
+            {
+                name = "Pop-Punk Progression",
+                pattern = new [] { F, C, G, Am },
+                multiplier = 3
+            },
+            new SPProgressionData
+            {
+                name = "Just The Two of Us Progression",
+                pattern = new [] { F, Em, Am, G },
+                multiplier = 3
+            },
+            new SPProgressionData
+            {
+                name = "Komuro's Progression",
+                pattern = new [] { Am, F, G, C },
+                multiplier = 3
+            },
+            new SPProgressionData
+            {
+                name = "Minor Canon Progression",
+                pattern = new [] { Am, Em, F, C },
+                multiplier = 3
+            },
+            new SPProgressionData
+            {
+                name = "Two-Five-One Progression",
+                pattern = new [] { Dm, G, C },
                 multiplier = 2
             },
             new SPProgressionData
             {
-                name = "God of Element",
-                pattern = new [] { explosion, freeze, hurricane },
-                multiplier = 3
+                name = "Minor Two-Five-One Progression",
+                pattern = new [] { Bdim, Em, Am },
+                multiplier = 2
             }
+
         };
 
         FProgressionList = new List<FProgressionData>()
         {
             new FProgressionData
             {
-                name = "Full Fire",
+                name = "SD-D-T",
                 pattern = new []
-                { ChordFunction.fire, ChordFunction.fire, ChordFunction.fire, ChordFunction.fire, ChordFunction.fire },
-                damage = 300
+                { ChordFunction.SD, ChordFunction.D, ChordFunction.T },
+                damage = 50
             },
             new FProgressionData
             {
-                name = "Full Ice",
+                name = "Deceptive Cadence (to D)",
                 pattern = new []
-                { ChordFunction.ice, ChordFunction.ice, ChordFunction.ice, ChordFunction.ice, ChordFunction.ice },
-                damage = 300
+                { ChordFunction.D, ChordFunction.D },
+                damage = 30
             },
             new FProgressionData
             {
-                name = "Full Wind",
+                name = "Deceptive Cadence (to SD)",
                 pattern = new []
-                { ChordFunction.wind,  ChordFunction.wind, ChordFunction.wind, ChordFunction.wind, ChordFunction.wind },
-                damage = 300
-            },
-            new FProgressionData
-            {
-                name = "Double Attack",
-                pattern = new []
-                { ChordFunction.normal, ChordFunction.normal },
-                damage = 100
+                { ChordFunction.D, ChordFunction.SD },
+                damage = 30
             }
         };
     }
