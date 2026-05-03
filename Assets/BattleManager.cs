@@ -27,6 +27,8 @@ public class BattleManager : MonoBehaviour
     public TextMeshProUGUI damageText;
     public TextMeshProUGUI errorText;
     public TextMeshProUGUI resultText;
+
+    public UnityEngine.UI.Button confirmButton;
     
     class Skill
     {
@@ -120,6 +122,9 @@ public class BattleManager : MonoBehaviour
             }
 
             UpdateTimerUI(selectTimerText, selectTimer);
+
+            HandleNumberInput();
+            ConfirmSpace();
         }
         if (state != GameState.Result && state != GameState.Finished)
         {
@@ -293,6 +298,30 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    void HandleNumberInput()
+    {
+        for (int i = 0; i < currentChoices.Count; i++)
+        {
+            // Alpha1〜Alpha4（上の数字キー）
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i) ||
+            Input.GetKeyDown(KeyCode.Keypad1 + i))
+            {
+                SelectSkill(i);
+            }
+        }
+    }
+
+    void ConfirmSpace()
+    {
+        if (combo.Count > 0)
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    ConfirmSelection();
+                }
+            }
+    }
+
     void ExecuteAction()
     {
         if(state != GameState.Executing) return;
@@ -381,6 +410,9 @@ public class BattleManager : MonoBehaviour
     void UpdateUI()
     {
         comboNumText.text = combo.Count + "/" +  MaxComboNum;
+
+        confirmButton.interactable = combo.Count > 0;
+
         if (combo.Count == 0)
         {
             selectedSkillsText.text = "No Skill";
