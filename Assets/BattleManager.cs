@@ -59,9 +59,16 @@ public class BattleManager : MonoBehaviour
     {
         public string name;
         public Skill[] pattern;
-        public int damage;
+        public int multiplier;
     }
     List<SPComboData> SPcomboList = new List<SPComboData>();
+
+    class EComboData
+    {
+        public string name;
+        public ElementType element;
+        public int damage; 
+    }
 
     public enum GameState
     {
@@ -98,15 +105,15 @@ public class BattleManager : MonoBehaviour
         {
             new SPComboData
             {
-                name = "AAA",
-                pattern = new [] { attack, attack, attack },
-                damage = 10 
+                name = "HotWind",
+                pattern = new [] { fire, wind },
+                multiplier = 2
             },
             new SPComboData
             {
-                name = "AFF",
-                pattern = new [] { attack, fire, fire },
-                damage = 20
+                name = "God of Element",
+                pattern = new [] { explosion, freeze, hurricane },
+                multiplier = 3
             }
         };
     }
@@ -392,7 +399,7 @@ public class BattleManager : MonoBehaviour
         {
             if (MatchCombo(c.pattern))
             {
-                damage += c.damage;
+                damage += CalculateSPComboModifier(c);
             }
         }
 
@@ -402,6 +409,13 @@ public class BattleManager : MonoBehaviour
         }
 
         return damage;
+    }
+    int CalculateSPComboModifier(SPComboData c)
+    {
+        int SPComboModifier = c.pattern.Sum(s => s.damage);
+        SPComboModifier *= c.multiplier;
+
+        return SPComboModifier;
     }
 
     int CalculateScore()

@@ -3118,7 +3118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleManager
   selectTimeLimit: 10
   battleTimeLimit: 100
-  enemyHP: 500
+  enemyHP: 1000
   finalScore: 0
   sumDamage: 0
   enemyText: {fileID: 1157763257}
