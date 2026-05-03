@@ -12,20 +12,24 @@ public class BattleManager : MonoBehaviour
     public float battleTimeLimit = 64f;
     float battleTimer;
 
-    int MaxEnemyHP = 1000;
-    public int enemyHP;
-    public int SPProgressionCounter;
-    public int FProgressionCounter;
-    public int ProgressionBonus;
-    public int finalScore;
-    public int sumDamage;
+    int maxTurn = 4;
+    int currentTurn;
 
+    int MaxEnemyHP = 1000;
+    int enemyHP;
+    int SPProgressionCounter;
+    int FProgressionCounter;
+    int ProgressionBonus;
+    int finalScore;
+    int sumDamage;
+
+    public TextMeshProUGUI battleTimerText;
+    public TextMeshProUGUI turnCountText;
     public TextMeshProUGUI enemyText;
     public TextMeshProUGUI selectedChordsText;
     public TextMeshProUGUI progressionNumText;
     public TextMeshProUGUI nextChoiceText;
     public TextMeshProUGUI selectTimerText;
-    public TextMeshProUGUI battleTimerText;
     public TextMeshProUGUI damageText;
     public TextMeshProUGUI errorText;
     public TextMeshProUGUI resultText;
@@ -76,12 +80,15 @@ public class BattleManager : MonoBehaviour
 
     public enum GameState
     {
-        Selecting,
-        Executing,
-        Result,
-        Finished
+        Selecting, Executing, Result, Finished
     }
-    GameState state;
+    GameState Gstate;
+
+    public enum FinishState
+    {
+        Unfinish, CREAR, TIMEOVER, TURNOVER
+    }
+    FinishState Fstate;
 
     void Awake()
     {
@@ -102,6 +109,24 @@ public class BattleManager : MonoBehaviour
 
         SPprogressionList = new List<SPProgressionData>()
         {
+            new SPProgressionData
+            {
+                name = "Canon Progression (8 Chords)",
+                pattern = new [] { C, G, Am, Em, F, C, Dm, G },
+                multiplier = 5
+            },
+            new SPProgressionData
+            {
+                name = "Minor Canon Progression (8 Chords)",
+                pattern = new [] { Am, Em, F, C, Dm, Am, Bdim, Em },
+                multiplier = 5
+            },
+            new SPProgressionData
+            {
+                name = "Only-one Progression (8 Chords)",
+                pattern = new [] { C, F, G, Em, Am, Dm, F, G },
+                multiplier = 5
+            },
             new SPProgressionData
             {
                 name = "Canon Progression",
@@ -179,14 +204,14 @@ public class BattleManager : MonoBehaviour
                 name = "Deceptive Cadence (to D)",
                 pattern = new []
                 { ChordFunction.D, ChordFunction.D },
-                damage = 30
+                damage = 20
             },
             new FProgressionData
             {
                 name = "Deceptive Cadence (to SD)",
                 pattern = new []
                 { ChordFunction.D, ChordFunction.SD },
-                damage = 30
+                damage = 20
             }
         };
     }
@@ -198,7 +223,7 @@ public class BattleManager : MonoBehaviour
 
     void Update()
     {
-        if (state == GameState.Selecting)
+        if (Gstate == GameState.Selecting)
         {
             selectTimer -= Time.deltaTime;
 
@@ -212,12 +237,13 @@ public class BattleManager : MonoBehaviour
             HandleNumberInput();
             ConfirmSpace();
         }
-        if (state != GameState.Result && state != GameState.Finished)
+        if (Gstate != GameState.Result && Gstate != GameState.Finished)
         {
             battleTimer -= Time.deltaTime;
 
             if (battleTimer <= 0f)
             {
+                Fstate = FinishState.TIMEOVER;
                 battleTimer = 0;
                 FinishGame();
             }
@@ -228,6 +254,7 @@ public class BattleManager : MonoBehaviour
 
     public void InitGame()
     {
+        currentTurn = 1;
         enemyHP = MaxEnemyHP;
         SPProgressionCounter = 0;
         FProgressionCounter = 0;
@@ -243,7 +270,8 @@ public class BattleManager : MonoBehaviour
 
         battleTimer = battleTimeLimit;
 
-        state = GameState.Selecting;
+        Gstate = GameState.Selecting;
+        Fstate = FinishState.Unfinish;
         selectTimer = selectTimeLimit;
 
         GenerateChoices();
@@ -254,7 +282,7 @@ public class BattleManager : MonoBehaviour
 
     public void SelectChord(int index)
     {
-        if(state != GameState.Selecting) return;
+        if(Gstate != GameState.Selecting) return;
         if(progression.Count >= MaxProgressionNum) {
             UpdateUI();
             errorText.text = "do not select chords over this" ;
@@ -270,7 +298,7 @@ public class BattleManager : MonoBehaviour
 
     public void RemoveLastChord()
     {
-        if (state != GameState.Selecting) return;
+        if (Gstate != GameState.Selecting) return;
         if (progression.Count == 0) return;
 
         progression.RemoveAt(progression.Count - 1);
@@ -279,7 +307,7 @@ public class BattleManager : MonoBehaviour
 
     public void ClearProgression()
     {
-        if (state != GameState.Selecting) return;
+        if (Gstate != GameState.Selecting) return;
         if (progression.Count == 0) return;
 
         progression.Clear();
@@ -288,7 +316,7 @@ public class BattleManager : MonoBehaviour
 
     public void ConfirmSelection()
     {
-        if(state != GameState.Selecting) return;
+        if(Gstate != GameState.Selecting) return;
         if(progression.Count == 0)
         {
             errorText.text = "Any Chord is not selected!";
@@ -296,7 +324,7 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        state = GameState.Executing;
+        Gstate = GameState.Executing;
         ExecuteAction();
     }
 
@@ -371,13 +399,10 @@ public class BattleManager : MonoBehaviour
     }
 
     void RefillChoices()
-    {
+    {   
+        if(nextChoice != null) currentChoices.Add(nextChoice);
+
         List<Chord> pool = chords.Except(currentChoices).ToList();
-
-        int rand = Random.Range(0, pool.Count);
-        currentChoices.Add(pool[rand]);
-        pool.RemoveAt(rand);
-
         if (pool.Count > 0)
         {
             nextChoice = pool[Random.Range(0, pool.Count)];
@@ -414,7 +439,7 @@ public class BattleManager : MonoBehaviour
 
     void ExecuteAction()
     {
-        if(state != GameState.Executing) return;
+        if(Gstate != GameState.Executing) return;
 
         sumDamage = CalculateDamage();
         enemyHP -= sumDamage;
@@ -425,32 +450,22 @@ public class BattleManager : MonoBehaviour
 
         if(enemyHP <= 0)
         {
+            Fstate = FinishState.CREAR;
             enemyHP = 0;
-            
             FinishGame();
-
             return;
         }
 
-        state = GameState.Selecting;
-        selectTimer = selectTimeLimit;
-        Modifier = "";
-        SPProgressionCounter = 0;
-        FProgressionCounter = 0;
-
-
-        GenerateChoices();
-        GenerateChordButtons();
+        NextTurn();
     }
 
     void FinishGame()
     {
-        state = GameState.Result;
+        Gstate = GameState.Result;
         finalScore = CalculateScore();
-
         UpdateUI();
 
-        state = GameState.Finished;
+        Gstate = GameState.Finished;
     }
 
     bool MatchSPProgression(Chord[] pattern)
@@ -511,8 +526,9 @@ public class BattleManager : MonoBehaviour
                 Modifier += $"SP: {c.name} (+{CalcResult})\n";
                 SPProgressionCounter++;
             }
+            if(SPProgressionCounter != 0) break;
         }
-
+        
         if(SPProgressionCounter == 0)
         {
             foreach (var c in FProgressionList)
@@ -533,7 +549,7 @@ public class BattleManager : MonoBehaviour
             damage += chord.damage;
         }
 
-        ProgressionBonus += 3 * SPProgressionCounter + FProgressionCounter;
+        ProgressionBonus += 5 * SPProgressionCounter + FProgressionCounter;
         return damage;
     }
     int CalculateSPProgressionModifier(SPProgressionData c)
@@ -544,12 +560,36 @@ public class BattleManager : MonoBehaviour
         return SPProgressionModifier;
     }
 
-    int CalculateScore()
+    void NextTurn()
     {
-        float hpRatio = (float)(MaxEnemyHP - enemyHP) / MaxEnemyHP;
-        float timeRatio = battleTimer / battleTimeLimit;
-        float score = hpRatio * timeRatio;
-        score *= 10000;
+        if (currentTurn >= maxTurn)
+        {
+            Fstate = FinishState.TURNOVER;
+            FinishGame();
+            return;
+        }
+        currentTurn++;
+        selectTimer = selectTimeLimit;
+        Gstate = GameState.Selecting;
+        Modifier = "";
+        SPProgressionCounter = 0;
+        FProgressionCounter = 0;
+
+        GenerateChoices();
+        GenerateChordButtons();
+        UpdateUI();
+    }
+
+    int CalculateScore()
+    {   
+        float score = 0;
+        if (Fstate == FinishState.CREAR)
+        {
+            float hpRatio = (float)(MaxEnemyHP - enemyHP) / MaxEnemyHP;
+            float timeRatio = battleTimer / battleTimeLimit;
+            score += hpRatio * timeRatio;
+            score *= 10000;
+        }
         score += ProgressionBonus * 100;
 
         return Mathf.RoundToInt(score);
@@ -575,25 +615,36 @@ public class BattleManager : MonoBehaviour
 
         enemyText.text = "Enemy HP: " + enemyHP;
 
-        if (state == GameState.Selecting)
+        if (Gstate == GameState.Selecting)
         {
             if (progression.Count != 0) errorText.text = "";
-            
+            turnCountText.text = "Turn: " + currentTurn + "/" + maxTurn;
         }
         else
         {
             selectTimerText.text = "";
         }
 
-        if (state == GameState.Executing)
+        if (Gstate == GameState.Executing)
         {
             damageText.text = sumDamage + " damage";
             if (Modifier != "") ModifierText.text = "ProgressionBornus\n" + Modifier;
         }
 
-        if (state == GameState.Result)
+        if (Gstate == GameState.Result)
         {
-            resultText.text = "SCORE: " + finalScore;
+            switch (Fstate)
+            {
+                case FinishState.CREAR:
+                    resultText.text = "SCORE: " + finalScore;
+                    break;
+                case FinishState.TIMEOVER:
+                    resultText.text = "TIMEOVER\nSCORE: " + finalScore;
+                    break;
+                case FinishState.TURNOVER:
+                    resultText.text = "TURNOVER\nSCORE: " + finalScore;
+                    break;  
+            }
         }
 
     }
