@@ -456,6 +456,7 @@ public class BattleManager : MonoBehaviour
             if (MatchSPCombo(c.pattern))
             {
                 damage += CalculateSPComboModifier(c);
+                Debug.Log("SP Combo: " + c.name);
             }
         }
 
@@ -464,6 +465,7 @@ public class BattleManager : MonoBehaviour
             if (MatchECombo(c.pattern))
             {
                 damage += c.damage;
+                Debug.Log("E Combo: " + c.name);
             }
         }
 
