@@ -3132,8 +3132,8 @@ MonoBehaviour:
   resultText: {fileID: 719093447}
   confirmButton: {fileID: 1078943372}
   choiceCount: 5
-  skillButtonPrefab: {fileID: 4384153888382200190, guid: c0df041a6cf014a76a8bd7ae4ff73b71, type: 3}
-  skillButtonParent: {fileID: 1710367288}
+  codeButtonPrefab: {fileID: 4384153888382200190, guid: c0df041a6cf014a76a8bd7ae4ff73b71, type: 3}
+  codeButtonParent: {fileID: 1710367288}
 --- !u!4 &1832586692
 Transform:
   m_ObjectHideFlags: 0

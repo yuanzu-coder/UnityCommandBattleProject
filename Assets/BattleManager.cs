@@ -19,8 +19,8 @@ public class BattleManager : MonoBehaviour
     public int sumDamage;
 
     public TextMeshProUGUI enemyText;
-    public TextMeshProUGUI selectedSkillsText;
-    public TextMeshProUGUI comboNumText;
+    public TextMeshProUGUI selectedChordsText;
+    public TextMeshProUGUI progressionNumText;
     public TextMeshProUGUI nextChoiceText;
     public TextMeshProUGUI selectTimerText;
     public TextMeshProUGUI battleTimerText;
@@ -30,46 +30,46 @@ public class BattleManager : MonoBehaviour
 
     public UnityEngine.UI.Button confirmButton;
     
-    class Skill
+    class Chord
     {
         public string name;
         public int damage;
-        public ElementType element;
+        public ChordFunction element;
     }
-    Skill attack, fire, ice, wind, 
+    Chord attack, fire, ice, wind, 
           volcano, blizzard, hurricane,
           explosion, freeze, tornado;
-    List<Skill> skills = new List<Skill>();
+    List<Chord> chords = new List<Chord>();
 
-    public enum ElementType
+    public enum ChordFunction
     {
         normal, fire, ice, wind
     }
 
-    int MaxComboNum = 5;
-    List<Skill> combo = new List<Skill>();
+    int MaxProgressionNum = 5;
+    List<Chord> progression = new List<Chord>();
 
-    List<Skill> currentChoices = new List<Skill>();
-    Skill nextChoice;
+    List<Chord> currentChoices = new List<Chord>();
+    Chord nextChoice;
     public int choiceCount = 5;
-    public GameObject skillButtonPrefab;
-    public Transform skillButtonParent;
+    public GameObject chordButtonPrefab;
+    public Transform chordButtonParent;
 
-    class SPComboData
+    class SPProgressionData
     {
         public string name;
-        public Skill[] pattern;
+        public Chord[] pattern;
         public int multiplier;
     }
-    List<SPComboData> SPcomboList = new List<SPComboData>();
+    List<SPProgressionData> SPprogressionList = new List<SPProgressionData>();
 
-    class EComboData
+    class FProgressionData
     {
         public string name;
-        public ElementType[] pattern;
+        public ChordFunction[] pattern;
         public int damage; 
     }
-    List<EComboData> EComboList = new List<EComboData>();
+    List<FProgressionData> FProgressionList = new List<FProgressionData>();
 
     public enum GameState
     {
@@ -82,35 +82,35 @@ public class BattleManager : MonoBehaviour
 
     void Awake()
     {
-        //Skillの宣言
-        attack = new Skill { name = "Attack", damage = 10, element = ElementType.normal };
-        fire = new Skill { name = "Fire", damage = 20, element = ElementType.fire };
-        ice = new Skill { name = "Ice", damage = 20, element = ElementType.ice };
-        wind = new Skill { name = "Wind", damage = 20, element = ElementType.wind };
-        volcano = new Skill { name = "Volcano", damage = 40, element = ElementType.fire };
-        blizzard = new Skill { name = "Blizzard", damage = 40, element = ElementType.ice };
-        hurricane = new Skill { name = "Hurricane", damage = 40, element = ElementType.wind };
-        explosion = new Skill { name = "Explosion", damage = 70, element = ElementType.fire };
-        freeze = new Skill { name = "Freeze", damage = 70, element = ElementType.ice };
-        tornado = new Skill { name = "Tornado", damage = 70, element = ElementType.wind };
+        //Chordの宣言
+        attack = new Chord { name = "Attack", damage = 10, element = ChordFunction.normal };
+        fire = new Chord { name = "Fire", damage = 20, element = ChordFunction.fire };
+        ice = new Chord { name = "Ice", damage = 20, element = ChordFunction.ice };
+        wind = new Chord { name = "Wind", damage = 20, element = ChordFunction.wind };
+        volcano = new Chord { name = "Volcano", damage = 40, element = ChordFunction.fire };
+        blizzard = new Chord { name = "Blizzard", damage = 40, element = ChordFunction.ice };
+        hurricane = new Chord { name = "Hurricane", damage = 40, element = ChordFunction.wind };
+        explosion = new Chord { name = "Explosion", damage = 70, element = ChordFunction.fire };
+        freeze = new Chord { name = "Freeze", damage = 70, element = ChordFunction.ice };
+        tornado = new Chord { name = "Tornado", damage = 70, element = ChordFunction.wind };
 
 
-        skills = new List<Skill>()
+        chords = new List<Chord>()
         {
             attack, fire, ice, wind, 
             volcano, blizzard, hurricane,
             explosion, freeze, tornado
         };
 
-        SPcomboList = new List<SPComboData>()
+        SPprogressionList = new List<SPProgressionData>()
         {
-            new SPComboData
+            new SPProgressionData
             {
                 name = "HotWind",
                 pattern = new [] { fire, wind },
                 multiplier = 2
             },
-            new SPComboData
+            new SPProgressionData
             {
                 name = "God of Element",
                 pattern = new [] { explosion, freeze, hurricane },
@@ -118,34 +118,34 @@ public class BattleManager : MonoBehaviour
             }
         };
 
-        EComboList = new List<EComboData>()
+        FProgressionList = new List<FProgressionData>()
         {
-            new EComboData
+            new FProgressionData
             {
                 name = "Full Fire",
                 pattern = new []
-                { ElementType.fire, ElementType.fire, ElementType.fire, ElementType.fire, ElementType.fire },
+                { ChordFunction.fire, ChordFunction.fire, ChordFunction.fire, ChordFunction.fire, ChordFunction.fire },
                 damage = 300
             },
-            new EComboData
+            new FProgressionData
             {
                 name = "Full Ice",
                 pattern = new []
-                { ElementType.ice, ElementType.ice, ElementType.ice, ElementType.ice, ElementType.ice },
+                { ChordFunction.ice, ChordFunction.ice, ChordFunction.ice, ChordFunction.ice, ChordFunction.ice },
                 damage = 300
             },
-            new EComboData
+            new FProgressionData
             {
                 name = "Full Wind",
                 pattern = new []
-                { ElementType.wind,  ElementType.wind, ElementType.wind, ElementType.wind, ElementType.wind },
+                { ChordFunction.wind,  ChordFunction.wind, ChordFunction.wind, ChordFunction.wind, ChordFunction.wind },
                 damage = 300
             },
-            new EComboData
+            new FProgressionData
             {
                 name = "Double Attack",
                 pattern = new []
-                { ElementType.normal, ElementType.normal },
+                { ChordFunction.normal, ChordFunction.normal },
                 damage = 100
             }
         };
@@ -203,51 +203,51 @@ public class BattleManager : MonoBehaviour
         selectTimer = selectTimeLimit;
 
         GenerateChoices();
-        GenerateSkillButtons();
+        GenerateChordButtons();
         
         UpdateUI();
     }
 
-    public void SelectSkill(int index)
+    public void SelectChord(int index)
     {
         if(state != GameState.Selecting) return;
-        if(combo.Count >= MaxComboNum) {
+        if(progression.Count >= MaxProgressionNum) {
             UpdateUI();
-            errorText.text = "do not select skills over this" ;
+            errorText.text = "do not select chords over this" ;
             return;
         }
-        combo.Add(currentChoices[index]);
+        progression.Add(currentChoices[index]);
         currentChoices.RemoveAt(index);
         RefillChoices();
-        GenerateSkillButtons();
+        GenerateChordButtons();
 
         UpdateUI();
     }
 
-    public void RemoveLastSkill()
+    public void RemoveLastChord()
     {
         if (state != GameState.Selecting) return;
-        if (combo.Count == 0) return;
+        if (progression.Count == 0) return;
 
-        combo.RemoveAt(combo.Count - 1);
+        progression.RemoveAt(progression.Count - 1);
         UpdateUI();
     }
 
-    public void ClearCombo()
+    public void ClearProgression()
     {
         if (state != GameState.Selecting) return;
-        if (combo.Count == 0) return;
+        if (progression.Count == 0) return;
 
-        combo.Clear();
+        progression.Clear();
         UpdateUI();
     }
 
     public void ConfirmSelection()
     {
         if(state != GameState.Selecting) return;
-        if(combo.Count == 0)
+        if(progression.Count == 0)
         {
-            errorText.text = "Any Skill is not selected!";
+            errorText.text = "Any Chord is not selected!";
             UpdateUI();
             return;
         }
@@ -258,17 +258,17 @@ public class BattleManager : MonoBehaviour
 
     void AutoConfirm()
     {
-        if (combo.Count == 0)
+        if (progression.Count == 0)
         {
-            errorText.text = "Time over! No skill selected.";
-            combo.Clear();
+            errorText.text = "Time over! No chord selected.";
+            progression.Clear();
             UpdateUI();
 
             selectTimer = selectTimeLimit;
             return;
         }
 
-        errorText.text = "Time over! Confirmed skill selection.";
+        errorText.text = "Time over! Confirmed chord selection.";
         ConfirmSelection();
     }
 
@@ -276,7 +276,7 @@ public class BattleManager : MonoBehaviour
     {
         currentChoices.Clear();
 
-        List<Skill> pool = new List<Skill>(skills);
+        List<Chord> pool = new List<Chord>(chords);
 
         for (int i = 0; i < choiceCount; i++)
         {
@@ -297,10 +297,10 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void GenerateSkillButtons()
+    void GenerateChordButtons()
     {
         // 既存ボタン削除
-        foreach (Transform child in skillButtonParent)
+        foreach (Transform child in chordButtonParent)
         {
             Destroy(child.gameObject);
         }
@@ -310,7 +310,7 @@ public class BattleManager : MonoBehaviour
         {
             int index = i;
 
-            GameObject btn = Instantiate(skillButtonPrefab, skillButtonParent);
+            GameObject btn = Instantiate(chordButtonPrefab, chordButtonParent);
 
             // テキスト設定
             var text = btn.GetComponentInChildren<TextMeshProUGUI>();
@@ -319,7 +319,7 @@ public class BattleManager : MonoBehaviour
             // ボタンイベント設定
             btn.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
             {
-                SelectSkill(index);
+                SelectChord(index);
             });
         }
 
@@ -328,7 +328,7 @@ public class BattleManager : MonoBehaviour
 
     void RefillChoices()
     {
-        List<Skill> pool = skills.Except(currentChoices).ToList();
+        List<Chord> pool = chords.Except(currentChoices).ToList();
 
         int rand = Random.Range(0, pool.Count);
         currentChoices.Add(pool[rand]);
@@ -352,14 +352,14 @@ public class BattleManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha1 + i) ||
             Input.GetKeyDown(KeyCode.Keypad1 + i))
             {
-                SelectSkill(i);
+                SelectChord(i);
             }
         }
     }
 
     void ConfirmSpace()
     {
-        if (combo.Count > 0)
+        if (progression.Count > 0)
             {
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
@@ -374,7 +374,7 @@ public class BattleManager : MonoBehaviour
 
         sumDamage = CalculateDamage();
         enemyHP -= sumDamage;
-        combo.Clear();
+        progression.Clear();
 
         if(enemyHP <= 0)
         {
@@ -390,7 +390,7 @@ public class BattleManager : MonoBehaviour
         selectTimer = selectTimeLimit;
 
         GenerateChoices();
-        GenerateSkillButtons();
+        GenerateChordButtons();
     }
 
     void FinishGame()
@@ -403,17 +403,17 @@ public class BattleManager : MonoBehaviour
         state = GameState.Finished;
     }
 
-    bool MatchSPCombo(Skill[] pattern)
+    bool MatchSPProgression(Chord[] pattern)
     {
-        if (combo.Count < pattern.Length) return false;
+        if (progression.Count < pattern.Length) return false;
 
-        for (int j = 0; j <= combo.Count - pattern.Length; j++)
+        for (int j = 0; j <= progression.Count - pattern.Length; j++)
         {
             bool match = true;
 
             for (int k = 0; k < pattern.Length; k++)
             {
-                if (combo[j + k] != pattern[k])
+                if (progression[j + k] != pattern[k])
                 {
                     match = false;
                     break;
@@ -425,17 +425,17 @@ public class BattleManager : MonoBehaviour
 
         return false;
     }
-    bool MatchECombo(ElementType[] pattern)
+    bool MatchFProgression(ChordFunction[] pattern)
     {
-        if (combo.Count < pattern.Length) return false;
+        if (progression.Count < pattern.Length) return false;
 
-        for (int j = 0; j <= combo.Count - pattern.Length; j++)
+        for (int j = 0; j <= progression.Count - pattern.Length; j++)
         {
             bool match = true;
 
             for (int k = 0; k < pattern.Length; k++)
             {
-                if (combo[j + k].element != pattern[k])
+                if (progression[j + k].element != pattern[k])
                 {
                     match = false;
                     break;
@@ -451,37 +451,37 @@ public class BattleManager : MonoBehaviour
     int CalculateDamage()
     {
         int damage = 0;
-        foreach (var c in SPcomboList)
+        foreach (var c in SPprogressionList)
         {
-            if (MatchSPCombo(c.pattern))
+            if (MatchSPProgression(c.pattern))
             {
-                damage += CalculateSPComboModifier(c);
-                Debug.Log("SP Combo: " + c.name);
+                damage += CalculateSPProgressionModifier(c);
+                Debug.Log("SP Progression: " + c.name);
             }
         }
 
-        foreach (var c in EComboList)
+        foreach (var c in FProgressionList)
         {
-            if (MatchECombo(c.pattern))
+            if (MatchFProgression(c.pattern))
             {
                 damage += c.damage;
-                Debug.Log("E Combo: " + c.name);
+                Debug.Log("E Progression: " + c.name);
             }
         }
 
-        foreach (var skill in combo)
+        foreach (var chord in progression)
         {
-            damage += skill.damage;
+            damage += chord.damage;
         }
 
         return damage;
     }
-    int CalculateSPComboModifier(SPComboData c)
+    int CalculateSPProgressionModifier(SPProgressionData c)
     {
-        int SPComboModifier = c.pattern.Sum(s => s.damage);
-        SPComboModifier *= c.multiplier;
+        int SPProgressionModifier = c.pattern.Sum(s => s.damage);
+        SPProgressionModifier *= c.multiplier;
 
-        return SPComboModifier;
+        return SPProgressionModifier;
     }
 
     int CalculateScore()
@@ -495,19 +495,19 @@ public class BattleManager : MonoBehaviour
 
     void UpdateUI()
     {
-        comboNumText.text = combo.Count + "/" +  MaxComboNum;
+        progressionNumText.text = progression.Count + "/" +  MaxProgressionNum;
 
-        confirmButton.interactable = combo.Count > 0;
+        confirmButton.interactable = progression.Count > 0;
 
-        if (combo.Count == 0)
+        if (progression.Count == 0)
         {
-            selectedSkillsText.text = "No Skill";
+            selectedChordsText.text = "No Chord";
         }
         else
         {
-            selectedSkillsText.text = "";
-            for(int i = 0; i < combo.Count; i++){
-                selectedSkillsText.text += $"{i + 1}: {combo[i].name}\n";
+            selectedChordsText.text = "";
+            for(int i = 0; i < progression.Count; i++){
+                selectedChordsText.text += $"{i + 1}: {progression[i].name}\n";
             }
         }
 
@@ -515,7 +515,7 @@ public class BattleManager : MonoBehaviour
 
         if (state == GameState.Selecting)
         {
-            if (combo.Count != 0) errorText.text = "";
+            if (progression.Count != 0) errorText.text = "";
         }
         else
         {
