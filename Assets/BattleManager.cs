@@ -66,9 +66,10 @@ public class BattleManager : MonoBehaviour
     class EComboData
     {
         public string name;
-        public ElementType element;
+        public ElementType[] pattern;
         public int damage; 
     }
+    List<EComboData> EComboList = new List<EComboData>();
 
     public enum GameState
     {
@@ -114,6 +115,38 @@ public class BattleManager : MonoBehaviour
                 name = "God of Element",
                 pattern = new [] { explosion, freeze, hurricane },
                 multiplier = 3
+            }
+        };
+
+        EComboList = new List<EComboData>()
+        {
+            new EComboData
+            {
+                name = "Full Fire",
+                pattern = new []
+                { ElementType.fire, ElementType.fire, ElementType.fire, ElementType.fire, ElementType.fire },
+                damage = 300
+            },
+            new EComboData
+            {
+                name = "Full Ice",
+                pattern = new []
+                { ElementType.ice, ElementType.ice, ElementType.ice, ElementType.ice, ElementType.ice },
+                damage = 300
+            },
+            new EComboData
+            {
+                name = "Full Wind",
+                pattern = new []
+                { ElementType.wind,  ElementType.wind, ElementType.wind, ElementType.wind, ElementType.wind },
+                damage = 300
+            },
+            new EComboData
+            {
+                name = "Double Attack",
+                pattern = new []
+                { ElementType.normal, ElementType.normal },
+                damage = 100
             }
         };
     }
@@ -315,7 +348,7 @@ public class BattleManager : MonoBehaviour
     {
         for (int i = 0; i < currentChoices.Count; i++)
         {
-            // Alpha1〜Alpha4（上の数字キー）
+            // Alpha1〜Alpha5（上の数字キー）
             if (Input.GetKeyDown(KeyCode.Alpha1 + i) ||
             Input.GetKeyDown(KeyCode.Keypad1 + i))
             {
@@ -370,7 +403,7 @@ public class BattleManager : MonoBehaviour
         state = GameState.Finished;
     }
 
-    bool MatchCombo(Skill[] pattern)
+    bool MatchSPCombo(Skill[] pattern)
     {
         if (combo.Count < pattern.Length) return false;
 
@@ -392,14 +425,45 @@ public class BattleManager : MonoBehaviour
 
         return false;
     }
+    bool MatchECombo(ElementType[] pattern)
+    {
+        if (combo.Count < pattern.Length) return false;
+
+        for (int j = 0; j <= combo.Count - pattern.Length; j++)
+        {
+            bool match = true;
+
+            for (int k = 0; k < pattern.Length; k++)
+            {
+                if (combo[j + k].element != pattern[k])
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match) return true;
+        }
+
+        return false;
+    }
+
     int CalculateDamage()
     {
         int damage = 0;
         foreach (var c in SPcomboList)
         {
-            if (MatchCombo(c.pattern))
+            if (MatchSPCombo(c.pattern))
             {
                 damage += CalculateSPComboModifier(c);
+            }
+        }
+
+        foreach (var c in EComboList)
+        {
+            if (MatchECombo(c.pattern))
+            {
+                damage += c.damage;
             }
         }
 
