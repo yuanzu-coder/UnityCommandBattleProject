@@ -98,13 +98,13 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         //Chordの宣言
-        C = new Chord { name = "C", damage = 20, element = ChordFunction.T };
-        Dm= new Chord { name = "Dm", damage = 20, element = ChordFunction.SD };
-        Em = new Chord { name = "Em", damage = 20, element = ChordFunction.D };
-        F = new Chord { name = "F", damage = 20, element = ChordFunction.SD };
-        G = new Chord { name = "G", damage = 20, element = ChordFunction.D };
-        Am = new Chord { name = "Am", damage = 20, element = ChordFunction.T };
-        Bdim = new Chord { name = "Bm(-5)", damage = 20, element = ChordFunction.SD };
+        C = new Chord { name = "C", damage = 10, element = ChordFunction.T };
+        Dm= new Chord { name = "Dm", damage = 10, element = ChordFunction.SD };
+        Em = new Chord { name = "Em", damage = 10, element = ChordFunction.D };
+        F = new Chord { name = "F", damage = 10, element = ChordFunction.SD };
+        G = new Chord { name = "G", damage = 10, element = ChordFunction.D };
+        Am = new Chord { name = "Am", damage = 10, element = ChordFunction.T };
+        Bdim = new Chord { name = "Bm(-5)", damage = 10, element = ChordFunction.SD };
 
 
         chords = new List<Chord>()
@@ -118,79 +118,79 @@ public class BattleManager : MonoBehaviour
             {
                 name = "Canon Progression (8 Chords)",
                 pattern = new [] { C, G, Am, Em, F, C, Dm, G },
-                multiplier = 5
+                multiplier = 7
             },
             new SPProgressionData
             {
                 name = "Minor Canon Progression (8 Chords)",
                 pattern = new [] { Am, Em, F, C, Dm, Am, Bdim, Em },
-                multiplier = 4
+                multiplier = 7
             },
             new SPProgressionData
             {
                 name = "Only-one Progression (8 Chords)",
                 pattern = new [] { C, F, G, Em, Am, Dm, F, G },
-                multiplier = 4
+                multiplier = 7
             },
             new SPProgressionData
             {
                 name = "Canon Progression",
                 pattern = new [] { C, G, Am, Em },
-                multiplier = 3
+                multiplier = 5
             },
             new SPProgressionData
             {
                 name = "Only-one Progression",
                 pattern = new [] { C, F, G, Em },
-                multiplier = 3
+                multiplier = 5
             },
             new SPProgressionData
             {
                 name = "Ascending Prpgression (from Dm)",
                 pattern = new [] { Dm, Em, F, G },
-                multiplier = 3
+                multiplier = 5
             },
             new SPProgressionData
             {
                 name = "Royal-Road Progression",
                 pattern = new [] { F, G, Em, Am },
-                multiplier = 3
+                multiplier = 5
             },
             new SPProgressionData
             {
                 name = "Pop-Punk Progression",
                 pattern = new [] { F, C, G, Am },
-                multiplier = 3
+                multiplier = 5
             },
             new SPProgressionData
             {
                 name = "Just The Two of Us Progression",
                 pattern = new [] { F, Em, Am, G },
-                multiplier = 3
+                multiplier = 5
             },
             new SPProgressionData
             {
                 name = "Komuro's Progression",
                 pattern = new [] { Am, F, G, C },
-                multiplier = 3
+                multiplier = 5
             },
             new SPProgressionData
             {
                 name = "Minor Canon Progression",
                 pattern = new [] { Am, Em, F, C },
-                multiplier = 3
+                multiplier = 5
             },
             new SPProgressionData
             {
                 name = "Two-Five-One Progression",
                 pattern = new [] { Dm, G, C },
-                multiplier = 2
+                multiplier = 4
             },
             new SPProgressionData
             {
                 name = "Minor Two-Five-One Progression",
                 pattern = new [] { Bdim, Em, Am },
-                multiplier = 2
+                multiplier = 4
             }
 
         };
@@ -202,7 +202,7 @@ public class BattleManager : MonoBehaviour
                 name = "SD-D-T",
                 pattern = new []
                 { ChordFunction.SD, ChordFunction.D, ChordFunction.T },
-                damage = 50
+                damage = 40
             },
             new FProgressionData
             {
@@ -335,13 +335,11 @@ public class BattleManager : MonoBehaviour
         {
             errorText.text = "Any Chord is not selected!";
             UpdateUI();
-            return;
         }
 
         confirmRemainTime = GetRemainingTime();
         FastSelectDamageBonus = Mathf.RoundToInt(confirmRemainTime);
         FastSelectScoreBonus += Mathf.RoundToInt(confirmRemainTime);
-;
 
         isConfirmed = true;
         Gstate = GameState.Waiting;
@@ -365,7 +363,7 @@ public class BattleManager : MonoBehaviour
     void StartExecutingPhase()
     {
         Gstate = GameState.Executing;
-        StartPhase(measureDuration * 5);
+        StartPhase(measureDuration * 6);
         ExecuteAction();
     }
     float GetRemainingTime()
@@ -378,14 +376,13 @@ public class BattleManager : MonoBehaviour
     {
         if (progression.Count == 0)
         {
-            errorText.text = "Time over! No chord selected.";
             progression.Clear();
-            UpdateUI();
-
-            return;
         }
-
-        errorText.text = "Time over! Confirmed chord selection.";
+        else
+        {
+            errorText.text = "Time over! Confirmed chord selection.";
+        }
+        
         ConfirmSelection();
     }
 
@@ -593,8 +590,12 @@ public class BattleManager : MonoBehaviour
         }
 
         damage += FastSelectDamageBonus * 10;
-
+        if(FastSelectDamageBonus != 0)
+        {
+            Modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
+        }
         ProgressionBonus += 2 * SPProgressionCounter + FProgressionCounter;
+        
         return damage;
     }
     int CalculateSPProgressionModifier(SPProgressionData c)
@@ -661,7 +662,7 @@ public class BattleManager : MonoBehaviour
 
         if (Gstate == GameState.Selecting)
         {
-            phaseText.text = "Selecting:";
+            phaseText.text = "Composing:";
             if (progression.Count != 0) errorText.text = "";
             turnCountText.text = "Turn: " + currentTurn + "/" + maxTurn;
         }
@@ -674,7 +675,7 @@ public class BattleManager : MonoBehaviour
         {
             phaseText.text = "Playing:";
             damageText.text = sumDamage + " damage";
-            if (Modifier != "") ModifierText.text = "ProgressionBornus\n" + Modifier;
+            if (Modifier != "") ModifierText.text = "BornusDamage\n" + Modifier;
         }
 
         if (Gstate == GameState.Result)
