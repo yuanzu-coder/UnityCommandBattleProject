@@ -124,13 +124,13 @@ public class BattleManager : MonoBehaviour
             {
                 name = "Minor Canon Progression (8 Chords)",
                 pattern = new [] { Am, Em, F, C, Dm, Am, Bdim, Em },
-                multiplier = 5
+                multiplier = 4
             },
             new SPProgressionData
             {
                 name = "Only-one Progression (8 Chords)",
                 pattern = new [] { C, F, G, Em, Am, Dm, F, G },
-                multiplier = 5
+                multiplier = 4
             },
             new SPProgressionData
             {
