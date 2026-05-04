@@ -28,13 +28,15 @@ public class BattleManager : MonoBehaviour
     int finalScore;
     int sumDamage;
 
+    public TextMeshProUGUI countDownText;
     public TextMeshProUGUI turnCountText;
     public TextMeshProUGUI phaseText;
+    public TextMeshProUGUI beatText;
+    public TextMeshProUGUI phaseTimerText;
     public TextMeshProUGUI enemyText;
     public TextMeshProUGUI selectedChordsText;
     public TextMeshProUGUI progressionNumText;
     public TextMeshProUGUI nextChoiceText;
-    public TextMeshProUGUI phaseTimerText;
     public TextMeshProUGUI damageText;
     public TextMeshProUGUI errorText;
     public TextMeshProUGUI resultText;
@@ -85,7 +87,7 @@ public class BattleManager : MonoBehaviour
 
     public enum GameState
     {
-        Selecting, Waiting, Executing, Result, Finished
+        Start, Selecting, Waiting, Calculating, Executing, Result, Finished
     }
     GameState Gstate;
 
@@ -223,15 +225,33 @@ public class BattleManager : MonoBehaviour
 
     void Start()
     {
+        Gstate = GameState.Start;
         InitGame();
     }
 
     void Update()
     {
-        if (Gstate == GameState.Selecting)
+        if (AudioSettings.dspTime < phaseStartTime)
+        {
+            return;
+        }
+
+        if (Gstate == GameState.Start)
         {
             float remain = GetRemainingTime();
-            UpdateTimerUI(phaseTimerText, remain);
+            UpdateCountDownUI();
+
+            if(remain <= 0f)
+            {
+                countDownText.text = "";
+                StartSelectingPhase();
+            }
+            
+        }
+        else if (Gstate == GameState.Selecting)
+        {
+            float remain = GetRemainingTime();
+            UpdateBeatUI();
 
             if (remain <= 0f)
             {
@@ -244,7 +264,17 @@ public class BattleManager : MonoBehaviour
         else if (Gstate == GameState.Waiting)
         {
             float remain = GetRemainingTime();
-            UpdateTimerUI(phaseTimerText, remain);
+            UpdateBeatUI();
+
+            if (remain <= 0f)
+            {
+                StartCalculatingPhase();
+            }
+        }
+        else if (Gstate == GameState.Calculating)
+        {
+            float remain = GetRemainingTime();
+            UpdateBeatUI();
 
             if (remain <= 0f)
             {
@@ -254,7 +284,7 @@ public class BattleManager : MonoBehaviour
         else if (Gstate == GameState.Executing)
         {
             float remain = GetRemainingTime();
-            UpdateTimerUI(phaseTimerText, remain);
+            UpdateCountDownUI();
 
             if (remain <= 0f)
             {
@@ -277,6 +307,8 @@ public class BattleManager : MonoBehaviour
         finalScore = 0;
         sumDamage = 0;
 
+        countDownText.text = "";
+        beatText.text = "";
         nextChoiceText.text = "";
         damageText.text = "";
         ModifierText.text = "";
@@ -286,11 +318,11 @@ public class BattleManager : MonoBehaviour
         
         InitMusicTiming();
         Fstate = FinishState.Unfinish;
-
-        StartSelectingPhase();
+        
+        StartPhase(measureDuration * 4);
         GenerateChoices();
         GenerateChordButtons();
-        
+
         UpdateUI();
     }
 
@@ -298,8 +330,7 @@ public class BattleManager : MonoBehaviour
     {
         if(Gstate != GameState.Selecting) return;
         if(progression.Count >= MaxProgressionNum) {
-            UpdateUI();
-            errorText.text = "do not select chords over this" ;
+            errorText.text = "do not select chords over this";
             return;
         }
         progression.Add(currentChoices[index]);
@@ -334,7 +365,6 @@ public class BattleManager : MonoBehaviour
         if(progression.Count == 0)
         {
             errorText.text = "Any Chord is not selected!";
-            UpdateUI();
         }
 
         confirmRemainTime = GetRemainingTime();
@@ -352,24 +382,42 @@ public class BattleManager : MonoBehaviour
     }
     void StartPhase(float duration)
     {
-        phaseStartTime = AudioSettings.dspTime;
+        phaseStartTime = AudioSettings.dspTime + 0.1;
+        phaseDuration = duration;
+    }
+    void NextPhase(float duration)
+    {
+        phaseStartTime += phaseDuration;
         phaseDuration = duration;
     }
     void StartSelectingPhase()
     {
         Gstate = GameState.Selecting;
-        StartPhase(measureDuration * 4);
+        NextPhase(measureDuration * 4);
+        UpdateUI();
+    }
+    void StartCalculatingPhase()
+    {
+        Gstate = GameState.Calculating;
+        NextPhase(measureDuration * 4);
+        sumDamage = CalculateDamage();
+        UpdateUI();
     }
     void StartExecutingPhase()
     {
         Gstate = GameState.Executing;
-        StartPhase(measureDuration * 6);
+        NextPhase(measureDuration * 2);
         ExecuteAction();
+        GenerateChoices();
+        GenerateChordButtons();
+        UpdateUI();
     }
     float GetRemainingTime()
     {
         double elapsed = AudioSettings.dspTime - phaseStartTime;
-        return Mathf.Max(0f, phaseDuration - (float)elapsed);
+        float remain = phaseDuration - (float)elapsed;
+
+        return Mathf.Max(0f, remain);
     }
 
     void AutoConfirm()
@@ -471,22 +519,20 @@ public class BattleManager : MonoBehaviour
     void ConfirmSpace()
     {
         if (progression.Count > 0)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    ConfirmSelection();
-                }
+                ConfirmSelection();
             }
+        }
     }
 
     void ExecuteAction()
     {
         if(Gstate != GameState.Executing) return;
 
-        sumDamage = CalculateDamage();
         enemyHP -= sumDamage;
         progression.Clear();
-        UpdateUI();
         
         Debug.Log("Bonus" + ProgressionBonus);
 
@@ -494,6 +540,12 @@ public class BattleManager : MonoBehaviour
         {
             Fstate = FinishState.CREAR;
             enemyHP = 0;
+            FinishGame();
+            return;
+        }
+        else if (currentTurn >= maxTurn)
+        {
+            Fstate = FinishState.TURNOVER;
             FinishGame();
             return;
         }
@@ -594,6 +646,7 @@ public class BattleManager : MonoBehaviour
         {
             Modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
         }
+
         ProgressionBonus += 2 * SPProgressionCounter + FProgressionCounter;
         
         return damage;
@@ -608,12 +661,6 @@ public class BattleManager : MonoBehaviour
 
     void NextTurn()
     {
-        if (currentTurn >= maxTurn)
-        {
-            Fstate = FinishState.TURNOVER;
-            FinishGame();
-            return;
-        }
         currentTurn++;
         
         Modifier = "";
@@ -621,8 +668,7 @@ public class BattleManager : MonoBehaviour
         FProgressionCounter = 0;
 
         StartSelectingPhase();
-        GenerateChoices();
-        GenerateChordButtons();
+        
         UpdateUI();
     }
 
@@ -665,21 +711,29 @@ public class BattleManager : MonoBehaviour
             phaseText.text = "Composing:";
             if (progression.Count != 0) errorText.text = "";
             turnCountText.text = "Turn: " + currentTurn + "/" + maxTurn;
+            countDownText.text = "";
         }
         else
         {
             phaseTimerText.text = "";
         }
 
-        if (Gstate == GameState.Executing)
+        if (Gstate == GameState.Calculating)
         {
             phaseText.text = "Playing:";
+        }
+
+        if (Gstate == GameState.Executing)
+        {
+            beatText.text = "";
+            phaseText.text = "Preparing:";
             damageText.text = sumDamage + " damage";
             if (Modifier != "") ModifierText.text = "BornusDamage\n" + Modifier;
         }
 
         if (Gstate == GameState.Result)
         {
+            beatText.text = "";
             switch (Fstate)
             {
                 case FinishState.CREAR:
@@ -698,6 +752,27 @@ public class BattleManager : MonoBehaviour
 
     void UpdateTimerUI(TextMeshProUGUI timerText, float timer)
     {
-        timerText.text = Mathf.Ceil(timer).ToString();
+        timerText.text = Mathf.Floor(timer).ToString();
+    }
+    void UpdateCountDownUI()
+    {
+        double elapsed = AudioSettings.dspTime - phaseStartTime;
+
+        int beat = Mathf.FloorToInt((float)((phaseDuration - elapsed) / beatDuration));
+        int count = beat / 2 + 1;
+        if (count <= 3)
+        {
+            countDownText.text = $"{count}";
+        }
+    }
+    void UpdateBeatUI()
+    {
+        double elapsed = AudioSettings.dspTime - phaseStartTime;
+
+        int beat = Mathf.FloorToInt((float)(elapsed / beatDuration));
+        int currentMeasure = beat / 4 + 1;
+        int beatInMeasure = beat % 4 + 1;
+
+        beatText.text = $"{currentMeasure}:  {beatInMeasure}";
     }
 }
