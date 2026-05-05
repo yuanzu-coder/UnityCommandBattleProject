@@ -50,19 +50,9 @@ public class BattleManager : MonoBehaviour
 
     public UnityEngine.UI.Button confirmButton;
     
-    class Chord
-    {
-        public string name;
-        public int damage;
-        public ChordFunction element;
-    }
     Chord C, Dm, Em, F, G, Am, Bdim;
     List<Chord> chords = new List<Chord>();
 
-    public enum ChordFunction
-    {
-        T, D, SD
-    }
 
     int MaxProgressionNum = 8;
     List<Chord> progression = new List<Chord>();
@@ -73,20 +63,7 @@ public class BattleManager : MonoBehaviour
     public GameObject chordButtonPrefab;
     public Transform chordButtonParent;
 
-    class SPProgressionData
-    {
-        public string name;
-        public Chord[] pattern;
-        public int multiplier;
-    }
     List<SPProgressionData> SPprogressionList = new List<SPProgressionData>();
-
-    class FProgressionData
-    {
-        public string name;
-        public ChordFunction[] pattern;
-        public int damage; 
-    }
     List<FProgressionData> FProgressionList = new List<FProgressionData>();
 
     string Modifier = "";
