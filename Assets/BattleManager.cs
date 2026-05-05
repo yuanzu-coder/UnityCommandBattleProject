@@ -6,6 +6,12 @@ using System.Linq;
 
 public class BattleManager : MonoBehaviour
 {
+    public AudioSource[] audioSources;
+    int audioIndex = 0;
+    public AudioClip clickSound;
+    double nextTickTime;
+    bool isMetronomeRunning;
+
     public float BPM = 120f;
     float beatDuration;     // 1拍
     float measureDuration;  // 1小節
@@ -226,11 +232,39 @@ public class BattleManager : MonoBehaviour
     void Start()
     {
         Gstate = GameState.Start;
+        for (int i = 0; i < audioSources.Length; i++)
+{
+    if (audioSources[i] == null)
+    {
+        Debug.LogError("NULL at index: " + i);
+    }
+    else
+    {
+        Debug.Log("OK: " + i + " " + audioSources[i].name);
+    }
+}
         InitGame();
     }
 
     void Update()
     {
+        if (isMetronomeRunning)
+        {
+            double dspTime = AudioSettings.dspTime;
+
+            while (nextTickTime < dspTime + 0.5)
+            {
+                AudioSource src = audioSources[audioIndex];
+
+                src.clip = clickSound;
+                src.PlayScheduled(nextTickTime);
+
+                audioIndex = (audioIndex + 1) % audioSources.Length;
+
+                nextTickTime += beatDuration;
+            }
+        }
+
         if (AudioSettings.dspTime < phaseStartTime)
         {
             return;
@@ -291,6 +325,8 @@ public class BattleManager : MonoBehaviour
                 NextTurn();
             }
         }
+
+        
     }
 
     public void InitGame()
@@ -323,6 +359,7 @@ public class BattleManager : MonoBehaviour
         GenerateChoices();
         GenerateChordButtons();
 
+        StartMetronome(phaseStartTime);
         UpdateUI();
     }
 
@@ -373,6 +410,12 @@ public class BattleManager : MonoBehaviour
 
         isConfirmed = true;
         Gstate = GameState.Waiting;
+    }
+
+    void StartMetronome(double startTime)
+    {
+        nextTickTime = startTime;
+        isMetronomeRunning = true;
     }
 
     void InitMusicTiming()
