@@ -6,6 +6,7 @@ using System.Linq;
 
 public class BattleManager : MonoBehaviour
 {
+    public NoteData key;
     public AudioSource[] audioSources;
     int audioIndex = 0;
     public AudioClip clickSound;
@@ -82,6 +83,7 @@ public class BattleManager : MonoBehaviour
 
     void Awake()
     {
+        key = NoteData.C;
         //Chordの宣言
         C = new Chord { name = "C", damage = 10, element = ChordFunction.T };
         Dm= new Chord { name = "Dm", damage = 10, element = ChordFunction.SD };
