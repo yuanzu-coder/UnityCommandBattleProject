@@ -29,7 +29,7 @@ public class BattleManager : MonoBehaviour
     int enemyHP;
     int FastSelectDamageBonus;
     int FastSelectScoreBonus;
-    int SPProgressionCounter;
+    int DegreeProgressionCounter;
     int FProgressionCounter;
     int ProgressionBonus;
     int finalScore;
@@ -58,6 +58,7 @@ public class BattleManager : MonoBehaviour
     int MaxProgressionNum = 8;
     List<Chord> progression = new List<Chord>();
     List<DegreeProgression> DegreeProgressions = new List<DegreeProgression>();
+    List<Chord> progpart = new List<Chord>();
 
     List<Chord> currentChoices = new List<Chord>();
     Chord nextChoice;
@@ -65,7 +66,6 @@ public class BattleManager : MonoBehaviour
     public GameObject chordButtonPrefab;
     public Transform chordButtonParent;
 
-    List<SPProgressionData> SPprogressionList = new List<SPProgressionData>();
     List<FProgressionData> FProgressionList = new List<FProgressionData>();
 
     string Modifier = "";
@@ -85,104 +85,9 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         key = NoteData.C;
-        //Chordの宣言
-        C = new Chord { name = "C", damage = 10, element = ChordFunction.T };
-        Dm= new Chord { name = "Dm", damage = 10, element = ChordFunction.SD };
-        Em = new Chord { name = "Em", damage = 10, element = ChordFunction.D };
-        F = new Chord { name = "F", damage = 10, element = ChordFunction.SD };
-        G = new Chord { name = "G", damage = 10, element = ChordFunction.D };
-        Am = new Chord { name = "Am", damage = 10, element = ChordFunction.T };
-        Bdim = new Chord { name = "Bm(-5)", damage = 10, element = ChordFunction.SD };
-
-        chords = new List<Chord>()
-        {
-            C, Dm, Em, F, G, Am, Bdim
-        };
-
-        SPprogressionList = new List<SPProgressionData>()
-        {
-            new SPProgressionData
-            {
-                name = "Canon Progression (8 Chords)",
-                pattern = new [] { C, G, Am, Em, F, C, Dm, G },
-                multiplier = 7
-            },
-            new SPProgressionData
-            {
-                name = "Minor Canon Progression (8 Chords)",
-                pattern = new [] { Am, Em, F, C, Dm, Am, Bdim, Em },
-                multiplier = 7
-            },
-            new SPProgressionData
-            {
-                name = "Only-one Progression (8 Chords)",
-                pattern = new [] { C, F, G, Em, Am, Dm, F, G },
-                multiplier = 7
-            },
-            new SPProgressionData
-            {
-                name = "Canon Progression",
-                pattern = new [] { C, G, Am, Em },
-                multiplier = 5
-            },
-            new SPProgressionData
-            {
-                name = "Only-one Progression",
-                pattern = new [] { C, F, G, Em },
-                multiplier = 5
-            },
-            new SPProgressionData
-            {
-                name = "Ascending Prpgression (from Dm)",
-                pattern = new [] { Dm, Em, F, G },
-                multiplier = 5
-            },
-            new SPProgressionData
-            {
-                name = "Royal-Road Progression",
-                pattern = new [] { F, G, Em, Am },
-                multiplier = 5
-            },
-            new SPProgressionData
-            {
-                name = "Pop-Punk Progression",
-                pattern = new [] { F, C, G, Am },
-                multiplier = 5
-            },
-            new SPProgressionData
-            {
-                name = "Just The Two of Us Progression",
-                pattern = new [] { F, Em, Am, G },
-                multiplier = 5
-            },
-            new SPProgressionData
-            {
-                name = "Komuro's Progression",
-                pattern = new [] { Am, F, G, C },
-                multiplier = 5
-            },
-            new SPProgressionData
-            {
-                name = "Minor Canon Progression",
-                pattern = new [] { Am, Em, F, C },
-                multiplier = 5
-            },
-            new SPProgressionData
-            {
-                name = "Two-Five-One Progression",
-                pattern = new [] { Dm, G, C },
-                multiplier = 4
-            },
-            new SPProgressionData
-            {
-                name = "Minor Two-Five-One Progression",
-                pattern = new [] { Bdim, Em, Am },
-                multiplier = 4
-            }
-
-        };
 
         chords = ChordManager.CreateTriadDiatonic(key);
+        DegreeProgressions = ProgressionManager.CreateDegreeProgression();
 
 
         FProgressionList = new List<FProgressionData>()
@@ -214,17 +119,6 @@ public class BattleManager : MonoBehaviour
     void Start()
     {
         Gstate = GameState.Start;
-        for (int i = 0; i < audioSources.Length; i++)
-{
-    if (audioSources[i] == null)
-    {
-        Debug.LogError("NULL at index: " + i);
-    }
-    else
-    {
-        Debug.Log("OK: " + i + " " + audioSources[i].name);
-    }
-}
         InitGame();
     }
 
@@ -319,7 +213,6 @@ public class BattleManager : MonoBehaviour
         FastSelectScoreBonus = 0;
         currentTurn = 1;
         enemyHP = MaxEnemyHP;
-        SPProgressionCounter = 0;
         FProgressionCounter = 0;
         ProgressionBonus = 0;
         finalScore = 0;
@@ -557,9 +450,9 @@ public class BattleManager : MonoBehaviour
         if(Gstate != GameState.Executing) return;
 
         enemyHP -= sumDamage;
+        Debug.Log("DAMAGE: " + sumDamage);
         progression.Clear();
         
-        Debug.Log("Bonus" + ProgressionBonus);
 
         if(enemyHP <= 0)
         {
@@ -578,28 +471,31 @@ public class BattleManager : MonoBehaviour
 
     void FinishGame()
     {
+        UpdateUI();
         Gstate = GameState.Result;
         finalScore = CalculateScore();
-        UpdateUI();
 
+        UpdateUI();
         Gstate = GameState.Finished;
     }
 
-    bool MatchSPProgression(Chord[] pattern)
+    bool MatchDegreeProgression(DegreeProgression prog)
     {
-        if (progression.Count < pattern.Length) return false;
+        if (progression.Count < prog.pattern.Length) return false;
 
-        for (int j = 0; j <= progression.Count - pattern.Length; j++)
+        for (int j = 0; j <= progression.Count - prog.pattern.Length; j++)
         {
             bool match = true;
 
-            for (int k = 0; k < pattern.Length; k++)
+            for (int k = 0; k < prog.pattern.Length; k++)
             {
-                if (progression[j + k].name != pattern[k].name)
+                if (progression[j + k].degree != prog.pattern[k])
                 {
                     match = false;
+                    progpart = new List<Chord>();
                     break;
                 }
+                progpart.Add(progression[j + k]);
             }
 
             if (match) return true;
@@ -607,6 +503,7 @@ public class BattleManager : MonoBehaviour
 
         return false;
     }
+
     bool MatchFProgression(ChordFunction[] pattern)
     {
         if (progression.Count < pattern.Length) return false;
@@ -633,34 +530,32 @@ public class BattleManager : MonoBehaviour
     int CalculateDamage()
     {
         int damage = 0;
-        foreach (var c in SPprogressionList)
+
+        foreach (var p in DegreeProgressions)
         {
-            if (MatchSPProgression(c.pattern))
+            if (MatchDegreeProgression(p))
             {
-                Debug.Log("SP: " + c.name);
-                int CalcResult = CalculateSPProgressionModifier(c);
+                int CalcResult = CalculateDegreeProgressionModifier(p, progpart);
                 damage += CalcResult;
-                Modifier += $"SP: {c.name} (+{CalcResult})\n";
-                SPProgressionCounter += c.pattern.Length;
+                Modifier += $"Degree: {p.name} (+{CalcResult})\n";
+                DegreeProgressionCounter += p.pattern.Length;
             }
-            if(SPProgressionCounter != 0) break;
+            if(DegreeProgressionCounter != 0) break;
         }
         
-        if(SPProgressionCounter == 0)
+        if(DegreeProgressionCounter == 0)
         {
             foreach (var c in FProgressionList)
             {
                 if (MatchFProgression(c.pattern))
                 {
-                    Debug.Log("E : " + c.name);
                     damage += c.damage;
-                    Modifier += $"E : {c.name} (+{c.damage})\n";
+                    Modifier += $"F : {c.name} (+{c.damage})\n";
                     FProgressionCounter++;
                 }
             }
         }
         
-
         foreach (var chord in progression)
         {
             damage += chord.Damage();
@@ -672,16 +567,16 @@ public class BattleManager : MonoBehaviour
             Modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
         }
 
-        ProgressionBonus += 2 * SPProgressionCounter + FProgressionCounter;
+        ProgressionBonus += 2 * DegreeProgressionCounter + FProgressionCounter;
         
         return damage;
     }
-    int CalculateSPProgressionModifier(SPProgressionData c)
+    int CalculateDegreeProgressionModifier(DegreeProgression p, List<Chord> prog)
     {
-        int SPProgressionModifier = c.pattern.Sum(s => s.damage);
-        SPProgressionModifier *= c.multiplier;
+        int DegreeProgressionModifier = prog.Sum(s => s.Damage());
+        DegreeProgressionModifier *= p.Multiplier();
 
-        return SPProgressionModifier;
+        return DegreeProgressionModifier;
     }
 
     void NextTurn()
@@ -689,12 +584,12 @@ public class BattleManager : MonoBehaviour
         currentTurn++;
         
         Modifier = "";
-        SPProgressionCounter = 0;
+        DegreeProgressionCounter = 0;
         FProgressionCounter = 0;
+        progpart = new List<Chord>();
 
-        StartSelectingPhase();
-        
         UpdateUI();
+        StartSelectingPhase();
     }
 
     int CalculateScore()

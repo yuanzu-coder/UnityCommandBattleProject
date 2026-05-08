@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class BattleCalculator
+public static class BattleCalculator
 {
     
 }
