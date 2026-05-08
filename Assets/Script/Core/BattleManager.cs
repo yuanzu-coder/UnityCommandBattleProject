@@ -57,6 +57,7 @@ public class BattleManager : MonoBehaviour
 
     int MaxProgressionNum = 8;
     List<Chord> progression = new List<Chord>();
+    List<DegreeProgression> DegreeProgressions = new List<DegreeProgression>();
 
     List<Chord> currentChoices = new List<Chord>();
     Chord nextChoice;
@@ -92,7 +93,6 @@ public class BattleManager : MonoBehaviour
         G = new Chord { name = "G", damage = 10, element = ChordFunction.D };
         Am = new Chord { name = "Am", damage = 10, element = ChordFunction.T };
         Bdim = new Chord { name = "Bm(-5)", damage = 10, element = ChordFunction.SD };
-
 
         chords = new List<Chord>()
         {
@@ -181,6 +181,9 @@ public class BattleManager : MonoBehaviour
             }
 
         };
+
+        chords = ChordManager.CreateTriadDiatonic(key);
+
 
         FProgressionList = new List<FProgressionData>()
         {
@@ -592,7 +595,7 @@ public class BattleManager : MonoBehaviour
 
             for (int k = 0; k < pattern.Length; k++)
             {
-                if (progression[j + k] != pattern[k])
+                if (progression[j + k].name != pattern[k].name)
                 {
                     match = false;
                     break;
@@ -660,7 +663,7 @@ public class BattleManager : MonoBehaviour
 
         foreach (var chord in progression)
         {
-            damage += chord.damage;
+            damage += chord.Damage();
         }
 
         damage += FastSelectDamageBonus * 10;

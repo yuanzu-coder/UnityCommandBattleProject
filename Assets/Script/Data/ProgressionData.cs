@@ -11,3 +11,18 @@ public class FProgressionData
     public ChordFunction[] pattern;
     public int damage; 
 }
+public class DegreeProgression
+{
+    public string name;
+    public Degree[] pattern;
+    public int Multiplier()
+    {
+        switch (pattern.Length)
+        {
+            case 8: return 7;
+            case 4: return 5;
+            case 3: return 4;
+            default: return 2;
+        }
+    }
+}

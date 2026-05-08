@@ -1,9 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class ChordManager
+public static class ChordManager
 {
-    public List<Chord> CreateTriadDiatonic(NoteData key)
+    public static List<Chord> CreateTriadDiatonic(NoteData key)
     {
         NoteData 
             note1 = key,
@@ -89,7 +89,7 @@ public class ChordManager
 
         return Chords;
     }
-    string GetDegree(Degree degree)
+    public static string GetDegree(Degree degree)
     {
         switch (degree)
         {
@@ -109,7 +109,7 @@ public class ChordManager
         }
         return "";
     }
-    string GetChordType(ChordType type)
+    public static string GetChordType(ChordType type)
     {
         switch (type)
         {
@@ -124,7 +124,7 @@ public class ChordManager
         }
         return "";
     }
-    string GetNoteName(NoteData note)
+    public static string GetNoteName(NoteData note)
     {
         switch (note)
         {
