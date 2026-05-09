@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public static class BattleCalculator
@@ -11,7 +10,7 @@ public static class BattleCalculator
         int FastSelectDamageBonus,
 
         ref int ProgressionScoreBonus,
-        ref string Modifier
+        ref string modifier
     )
     {
         int damage = 0;
@@ -23,9 +22,9 @@ public static class BattleCalculator
         {
             if (BattleCalculator.MatchDegreeProgression(progpart, progression, p.pattern))
             {
-                int CalcResult = BattleCalculator.CalculateDegreeProgressionModifier(p, progpart);
+                int CalcResult = BattleCalculator.CalculateDegreeProgressionmodifier(p, progpart);
                 damage += CalcResult;
-                Modifier += $"Degree: {p.name} (+{CalcResult})\n";
+                modifier += $"Degree: {p.name} (+{CalcResult})\n";
                 DegreeProgressionCounter += p.pattern.Length;
             }
             if(DegreeProgressionCounter != 0) break;
@@ -38,7 +37,7 @@ public static class BattleCalculator
                 if (BattleCalculator.MatchFProgression(progression, p.pattern))
                 {
                     damage += p.damage;
-                    Modifier += $"F : {p.name} (+{p.damage})\n";
+                    modifier += $"F : {p.name} (+{p.damage})\n";
                     FProgressionCounter++;
                 }
             }
@@ -52,26 +51,26 @@ public static class BattleCalculator
         damage += FastSelectDamageBonus * 10;
         if(FastSelectDamageBonus != 0)
         {
-            Modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
+            modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
         }
 
         ProgressionScoreBonus += 2 * DegreeProgressionCounter + FProgressionCounter;
         
         return damage;
     }
-    public static int CalculateDegreeProgressionModifier(
+    public static int CalculateDegreeProgressionmodifier(
         DegreeProgression p,
         List<Chord> progpart
     )
     {
-        int DegreeProgressionModifier = 0;
+        int DegreeProgressionmodifier = 0;
         foreach (var c in progpart)
         {
-            DegreeProgressionModifier += c.Damage();
+            DegreeProgressionmodifier += c.Damage();
         }
-        DegreeProgressionModifier *= p.Multiplier();
+        DegreeProgressionmodifier *= p.Multiplier();
 
-        return DegreeProgressionModifier;
+        return DegreeProgressionmodifier;
     } 
     public static bool MatchDegreeProgression(
         List<Chord> progpart,
@@ -136,7 +135,7 @@ public static class BattleCalculator
     )
     {   
         float score = 0;
-        
+
         if (Fstate == FinishState.CREAR)
         {
             score += (maxTurn - currentTurn + 1) * 2000;

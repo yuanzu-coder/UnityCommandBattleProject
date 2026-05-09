@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 
+
 public class BattleManager : MonoBehaviour
 {
+    [SerializeField] UIManager ui;
     public NoteData key;
     public AudioSource[] audioSources;
     int audioIndex = 0;
@@ -34,18 +36,18 @@ public class BattleManager : MonoBehaviour
     int sumDamage;
 
     public TextMeshProUGUI countDownText;
+    public TextMeshProUGUI keyText;
     public TextMeshProUGUI turnCountText;
     public TextMeshProUGUI phaseText;
     public TextMeshProUGUI beatText;
-    public TextMeshProUGUI phaseTimerText;
-    public TextMeshProUGUI enemyText;
+    public TextMeshProUGUI enemyHPText;
     public TextMeshProUGUI selectedChordsText;
     public TextMeshProUGUI progressionNumText;
     public TextMeshProUGUI nextChoiceText;
     public TextMeshProUGUI damageText;
     public TextMeshProUGUI errorText;
     public TextMeshProUGUI resultText;
-    public TextMeshProUGUI ModifierText;
+    public TextMeshProUGUI modifierText;
 
     public UnityEngine.UI.Button confirmButton;
     
@@ -66,7 +68,7 @@ public class BattleManager : MonoBehaviour
 
     List<FProgression> FProgressionList = new List<FProgression>();
 
-    string Modifier = "";
+    string modifier = "";
 
     GameState Gstate;
     FinishState Fstate;
@@ -77,32 +79,7 @@ public class BattleManager : MonoBehaviour
 
         chords = ChordManager.CreateTriadDiatonic(key);
         DegreeProgressionList = ProgressionManager.CreateDegreeProgression();
-
-
-        FProgressionList = new List<FProgression>()
-        {
-            new FProgression
-            {
-                name = "SD-D-T",
-                pattern = new []
-                { ChordFunction.SD, ChordFunction.D, ChordFunction.T },
-                damage = 40
-            },
-            new FProgression
-            {
-                name = "Deceptive Cadence (to D)",
-                pattern = new []
-                { ChordFunction.D, ChordFunction.D },
-                damage = 20
-            },
-            new FProgression
-            {
-                name = "Deceptive Cadence (to SD)",
-                pattern = new []
-                { ChordFunction.D, ChordFunction.SD },
-                damage = 20
-            }
-        };
+        FProgressionList = ProgressionManager.CreateFProgression();
     }
 
     void Start()
@@ -208,7 +185,7 @@ public class BattleManager : MonoBehaviour
         beatText.text = "";
         nextChoiceText.text = "";
         damageText.text = "";
-        ModifierText.text = "";
+        modifierText.text = "";
         errorText.text = "";
         resultText.text = "";
 
@@ -216,7 +193,7 @@ public class BattleManager : MonoBehaviour
         InitMusicTiming();
         Fstate = FinishState.Unfinish;
         
-        StartPhase(measureDuration * 4);
+        StartPhase(measureDuration * 2);
         GenerateChoices();
         GenerateChordButtons();
 
@@ -310,7 +287,7 @@ public class BattleManager : MonoBehaviour
         FProgressionList,
         FastSelectDamageBonus,
         ref ProgressionScoreBonus,
-        ref Modifier
+        ref modifier
     );
         UpdateUI();
     }
@@ -482,31 +459,16 @@ public class BattleManager : MonoBehaviour
     {
         currentTurn++;
         
-        Modifier = "";
-        /*DegreeProgressionCounter = 0;
-        FProgressionCounter = 0;*/
+        modifier = "";
         progression.Clear();
 
         UpdateUI();
         StartSelectingPhase();
     }
 
-    /*int CalculateScore()
-    {   
-        float score = 0;
-        if (Fstate == FinishState.CREAR)
-        {
-            score += (maxTurn - currentTurn + 1) * 2000;
-            score += FastSelectScoreBonus * 20;
-        }
-        score += ProgressionScoreBonus * 50;
-        
-
-        return Mathf.RoundToInt(score);
-    }*/
-
     void UpdateUI()
     {
+        keyText.text = "Key: " + ChordManager.GetNoteName(key);
         progressionNumText.text = progression.Count + "/" +  MaxProgressionNum;
 
         confirmButton.interactable = progression.Count > 0;
@@ -523,7 +485,7 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        enemyText.text = "Enemy HP: " + enemyHP;
+        enemyHPText.text = "Enemy HP: " + enemyHP;
 
         if (Gstate == GameState.Selecting)
         {
@@ -531,10 +493,6 @@ public class BattleManager : MonoBehaviour
             if (progression.Count != 0) errorText.text = "";
             turnCountText.text = "Turn: " + currentTurn + "/" + maxTurn;
             countDownText.text = "";
-        }
-        else
-        {
-            phaseTimerText.text = "";
         }
 
         if (Gstate == GameState.Calculating)
@@ -547,7 +505,7 @@ public class BattleManager : MonoBehaviour
             beatText.text = "";
             phaseText.text = "Preparing:";
             damageText.text = sumDamage + " damage";
-            if (Modifier != "") ModifierText.text = "BornusDamage\n" + Modifier;
+            if (modifier != "") modifierText.text = "BornusDamage\n" + modifier;
         }
 
         if (Gstate == GameState.Result)
@@ -558,15 +516,11 @@ public class BattleManager : MonoBehaviour
                 case FinishState.CREAR:
                     resultText.text = "SCORE: " + finalScore;
                     break;
-                case FinishState.TIMEOVER:
-                    resultText.text = "TIMEOVER\nSCORE: " + finalScore;
-                    break;
                 case FinishState.TURNOVER:
                     resultText.text = "TURNOVER\nSCORE: " + finalScore;
                     break;  
             }
         }
-
     }
 
     void UpdateTimerUI(TextMeshProUGUI timerText, float timer)

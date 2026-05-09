@@ -7,5 +7,5 @@ public enum GameState
 
 public enum FinishState
 {
-    Unfinish, CREAR, TIMEOVER, TURNOVER
+    Unfinish, CREAR, TURNOVER
 }

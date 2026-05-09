@@ -76,4 +76,31 @@ public static class ProgressionManager
 
         return Progressions;
     }
+
+    public static List<FProgression> CreateFProgression()
+    {
+        List<FProgression> FProgressionList = new List<FProgression>()
+        {
+            new FProgression
+            {
+                name = "SD-D-T",
+                pattern = new [] { ChordFunction.SD, ChordFunction.D, ChordFunction.T },
+                damage = 80
+            },
+            new FProgression
+            {
+                name = "Deceptive Cadence (to D)",
+                pattern = new [] { ChordFunction.D, ChordFunction.D },
+                damage = 40
+            },
+            new FProgression
+            {
+                name = "Deceptive Cadence (to SD)",
+                pattern = new [] { ChordFunction.D, ChordFunction.SD },
+                damage = 40
+            }
+        };
+
+        return FProgressionList; 
+    }
 }
