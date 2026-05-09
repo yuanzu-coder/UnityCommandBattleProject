@@ -10,7 +10,7 @@ public static class BattleCalculator
         int FastSelectDamageBonus,
 
         ref int ProgressionScoreBonus,
-        ref string modifier
+        ref List<string> modifier
     )
     {
         int damage = 0;
@@ -22,9 +22,9 @@ public static class BattleCalculator
         {
             if (BattleCalculator.MatchDegreeProgression(progpart, progression, p.pattern))
             {
-                int CalcResult = BattleCalculator.CalculateDegreeProgressionmodifier(p, progpart);
+                int CalcResult = BattleCalculator.CalculateDegreeProgressionModifier(p, progpart);
                 damage += CalcResult;
-                modifier += $"Degree: {p.name} (+{CalcResult})\n";
+                modifier.Add($"Degree: {p.name} (+{CalcResult})");
                 DegreeProgressionCounter += p.pattern.Length;
             }
             if(DegreeProgressionCounter != 0) break;
@@ -37,7 +37,7 @@ public static class BattleCalculator
                 if (BattleCalculator.MatchFProgression(progression, p.pattern))
                 {
                     damage += p.damage;
-                    modifier += $"F : {p.name} (+{p.damage})\n";
+                    modifier.Add($"F : {p.name} (+{p.damage})\n");
                     FProgressionCounter++;
                 }
             }
@@ -51,14 +51,14 @@ public static class BattleCalculator
         damage += FastSelectDamageBonus * 10;
         if(FastSelectDamageBonus != 0)
         {
-            modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
+            modifier.Add($"Fast Select Bonus: +{FastSelectDamageBonus * 10}");
         }
 
         ProgressionScoreBonus += 2 * DegreeProgressionCounter + FProgressionCounter;
         
         return damage;
     }
-    public static int CalculateDegreeProgressionmodifier(
+    public static int CalculateDegreeProgressionModifier(
         DegreeProgression p,
         List<Chord> progpart
     )

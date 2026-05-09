@@ -2,35 +2,94 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 
-public static class DefaultUI
+public class DefaultUI : MonoBehaviour
 {
-    public static void UpdateKeyUI(
-        TextMeshProUGUI keyText,
+    [SerializeField] TextMeshProUGUI keyText;
+    [SerializeField] TextMeshProUGUI turnCountText;
+    [SerializeField] TextMeshProUGUI phaseText;
+    
+    [SerializeField] TextMeshProUGUI nextChoiceText;
+    [SerializeField] TextMeshProUGUI progressionCountText;
+    [SerializeField] TextMeshProUGUI selectedChordsText;
+    
+    [SerializeField] TextMeshProUGUI damageText;
+    [SerializeField] TextMeshProUGUI modifierText;
+    [SerializeField] TextMeshProUGUI enemyHPText;
+
+    [SerializeField] TextMeshProUGUI resultText;
+    
+
+    [SerializeField] TextMeshProUGUI errorText;
+    public void UpdateAllUI(
+        NoteData key,
+        int maxTurn,
+        int currentTurn,
+        GameState Gstate,
+        Chord nextChoice,
+        int MaxProgressionLength,
+        List<Chord> progression,
+        int sumDamage,
+        List<string> modifier,
+        int enemyHP,
+        int finalScore,
+        FinishState Fstate,
+        ref List<string> errors
+    )
+    {
+        UpdateKeyUI(key);
+        UpdateTurnUI(maxTurn, currentTurn);
+        UpdatePhaseUI(Gstate);
+        UpdateNextChoiceUI(nextChoice);
+        UpdateSelctedChordCountUI(MaxProgressionLength,progression);
+        UpdateSelectedChordsListUI(progression);
+        UpdateDamageUI(sumDamage, Gstate);
+        UpdateModifierUI(modifier);
+        UpdateEnemyHPUI(enemyHP);
+        UpdateResultUI(finalScore,Fstate);
+        UpdateErrorUI(ref errors);
+    }
+
+
+    public void UpdateSelecting(
+        Chord nextChoice,
+        int MaxProgressionLength,
+        List<Chord> progression
+    )
+    {
+        UpdateNextChoiceUI(nextChoice);
+        UpdateSelctedChordCountUI(MaxProgressionLength, progression);
+        UpdateSelectedChordsListUI(progression);
+    }
+
+    public void UpdateExecuting(
+        int sumDamage,
+        GameState Gstate,
+        List<string> modifier,
+        int enemyHP
+    )
+    {
+        UpdateDamageUI(sumDamage, Gstate);
+        UpdateModifierUI(modifier);
+        UpdateEnemyHPUI(enemyHP);
+    }
+
+
+    public void UpdateKeyUI(
         NoteData key
     )
     {
         keyText.text = ChordManager.GetNoteName(key);
     }
 
-    public static void UpdateEnemyHPUI(
-        TextMeshProUGUI enemyHPText,
-        int enemyHP
-    )
-    {
-        enemyHPText.text = $"{enemyHP}";
-    }
-
-    public static void UpdateTurnUI(
+    public void UpdateTurnUI(
         int maxTurn,
-        int currentTurn,
-        TextMeshProUGUI turnCountText
+        int currentTurn
     )
     {
         turnCountText.text = currentTurn + "/" + maxTurn;
     }
 
-    public static void UpdatePhaseUI(
-        TextMeshProUGUI phaseText,
+    public void UpdatePhaseUI(
         GameState Gstate
     )
     {
@@ -40,27 +99,24 @@ public static class DefaultUI
         else if (Gstate == GameState.Executing) phaseText.text = "Preparing";
     }
 
-    public static void UpdateNextChoiceUI(
-        Chord nextChoice,
-        TextMeshProUGUI nextChoiceText
+    public void UpdateNextChoiceUI(
+        Chord nextChoice
     )
     {
         nextChoiceText.text = "";
         if (nextChoice != null) nextChoiceText.text = nextChoice.name;
     }
 
-    public static void UpdateSelctedChordCountUI(
-        int MaxProgressionNum,
-        List<Chord> progression,
-        TextMeshProUGUI progressionCountText
+    public void UpdateSelctedChordCountUI(
+        int MaxProgressionLength,
+        List<Chord> progression
     )
     {
-        progressionCountText.text = progression.Count + "/" +  MaxProgressionNum;
+        progressionCountText.text = progression.Count + "/" +  MaxProgressionLength;
     }
 
-    public static void UpdateSelectedChordsListUI(
-        List<Chord> progression,
-        TextMeshProUGUI selectedChordsText
+    public void UpdateSelectedChordsListUI(
+        List<Chord> progression
     )
     {
         selectedChordsText.text = "";
@@ -69,9 +125,8 @@ public static class DefaultUI
         }
     }
 
-    public static void UpdateDamageUI(
+    public void UpdateDamageUI(
         int sumDamage,
-        TextMeshProUGUI damageText,
         GameState Gstate
     )
     {
@@ -79,18 +134,26 @@ public static class DefaultUI
         if (Gstate == GameState.Executing) damageText.text = sumDamage + " damage";
     }
 
-    public static void UpdateModifierUI(
-        string modifier,
-        TextMeshProUGUI modifierText
+    public void UpdateModifierUI(
+        List<string> modifier
     )
-    {
+    {   
         modifierText.text = "";
-        if (modifier != "") modifierText.text = "BornusDamage\n" + modifier;
+        if (modifier.Count != 0) modifierText.text = "BornusDamage\n";
+        for(int i = 0; i < modifier.Count; i++){
+            modifierText.text = modifier[i] + "\n";
+        }
     }
 
-    public static void UpdateResultUI(
+    public void UpdateEnemyHPUI(
+        int enemyHP
+    )
+    {
+        enemyHPText.text = $"{enemyHP}";
+    }
+
+    public void UpdateResultUI(
         int finalScore,
-        TextMeshProUGUI resultText,
         FinishState Fstate
     )
     {
@@ -106,14 +169,14 @@ public static class DefaultUI
         }
     }
     
-    public static void UpdateErrorUI(
-        List<string> errors,
-        TextMeshProUGUI errorText
+    public void UpdateErrorUI(
+        ref List<string> errors
     )
     {
         errorText.text = "";
         for(int i = 0; i < errors.Count; i++){
             errorText.text += errors[i] + "\n";
         }
+        errors.Clear();
     }   
 }
