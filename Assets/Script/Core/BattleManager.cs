@@ -68,16 +68,7 @@ public class BattleManager : MonoBehaviour
 
     string Modifier = "";
 
-    public enum GameState
-    {
-        Start, Selecting, Waiting, Calculating, Executing, Result, Finished
-    }
     GameState Gstate;
-
-    public enum FinishState
-    {
-        Unfinish, CREAR, TIMEOVER, TURNOVER
-    }
     FinishState Fstate;
 
     void Awake()
@@ -475,112 +466,17 @@ public class BattleManager : MonoBehaviour
     {
         UpdateUI();
         Gstate = GameState.Result;
-        finalScore = CalculateScore();
+        finalScore = BattleCalculator.CalculateScore(
+            Fstate,
+            maxTurn,
+            currentTurn,
+            FastSelectScoreBonus,
+            ProgressionScoreBonus
+        );
 
         UpdateUI();
         Gstate = GameState.Finished;
     }
-
-    /*bool MatchDegreeProgression(DegreeProgression prog)
-    {
-        if (progression.Count < prog.pattern.Length) return false;
-
-        for (int j = 0; j <= progression.Count - prog.pattern.Length; j++)
-        {
-            bool match = true;
-
-            for (int k = 0; k < prog.pattern.Length; k++)
-            {
-                if (progression[j + k].degree != prog.pattern[k])
-                {
-                    match = false;
-                    progpart = new List<Chord>();
-                    break;
-                }
-                progpart.Add(progression[j + k]);
-            }
-
-            if (match) return true;
-        }
-
-        return false;
-    }
-
-    bool MatchFProgression(ChordFunction[] pattern)
-    {
-        if (progression.Count < pattern.Length) return false;
-
-        for (int j = 0; j <= progression.Count - pattern.Length; j++)
-        {
-            bool match = true;
-
-            for (int k = 0; k < pattern.Length; k++)
-            {
-                if (progression[j + k].element != pattern[k])
-                {
-                    match = false;
-                    break;
-                }
-            }
-
-            if (match) return true;
-        }
-
-        return false;
-    }
-
-    int CalculateDamage()
-    {
-        int damage = 0;
-        List<Chord> progpart = new List<Chord>();
-
-        foreach (var p in DegreeProgressionList)
-        {
-            if (BattleCalculator.MatchDegreeProgression(progpart, progression, p.pattern))
-            {
-                int CalcResult = BattleCalculator.CalculateDegreeProgressionModifier(p, progpart);
-                damage += CalcResult;
-                Modifier += $"Degree: {p.name} (+{CalcResult})\n";
-                DegreeProgressionCounter += p.pattern.Length;
-            }
-            if(DegreeProgressionCounter != 0) break;
-        }
-        
-        if(DegreeProgressionCounter == 0)
-        {
-            foreach (var p in FProgressionList)
-            {
-                if (BattleCalculator.MatchFProgression(progression, p.pattern))
-                {
-                    damage += p.damage;
-                    Modifier += $"F : {p.name} (+{p.damage})\n";
-                    FProgressionCounter++;
-                }
-            }
-        }
-        
-        foreach (var chord in progression)
-        {
-            damage += chord.Damage();
-        }
-
-        damage += FastSelectDamageBonus * 10;
-        if(FastSelectDamageBonus != 0)
-        {
-            Modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
-        }
-
-        ProgressionScoreBonus += 2 * DegreeProgressionCounter + FProgressionCounter;
-        
-        return damage;
-    }
-    int CalculateDegreeProgressionModifier(DegreeProgression p, List<Chord> prog)
-    {
-        int DegreeProgressionModifier = prog.Sum(s => s.Damage());
-        DegreeProgressionModifier *= p.Multiplier();
-
-        return DegreeProgressionModifier;
-    }*/
 
     void NextTurn()
     {
@@ -595,7 +491,7 @@ public class BattleManager : MonoBehaviour
         StartSelectingPhase();
     }
 
-    int CalculateScore()
+    /*int CalculateScore()
     {   
         float score = 0;
         if (Fstate == FinishState.CREAR)
@@ -607,7 +503,7 @@ public class BattleManager : MonoBehaviour
         
 
         return Mathf.RoundToInt(score);
-    }
+    }*/
 
     void UpdateUI()
     {

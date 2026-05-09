@@ -73,7 +73,6 @@ public static class BattleCalculator
 
         return DegreeProgressionModifier;
     } 
-    
     public static bool MatchDegreeProgression(
         List<Chord> progpart,
         List<Chord> progression,
@@ -126,5 +125,26 @@ public static class BattleCalculator
         }
 
         return false;
+    }
+
+    public static int CalculateScore(
+        FinishState Fstate,
+        int maxTurn,
+        int currentTurn,
+        int FastSelectScoreBonus,
+        int ProgressionScoreBonus
+    )
+    {   
+        float score = 0;
+        
+        if (Fstate == FinishState.CREAR)
+        {
+            score += (maxTurn - currentTurn + 1) * 2000;
+            score += FastSelectScoreBonus * 20;
+        }
+        score += ProgressionScoreBonus * 50;
+        
+
+        return Mathf.RoundToInt(score);
     }
 }
