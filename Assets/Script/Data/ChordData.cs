@@ -4,7 +4,6 @@ public class Chord
 {
     public string degreeName;
     public string name;
-    public int damage;
     public int Damage()
     {
         if(GetTone().Length == 3) return 10;

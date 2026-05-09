@@ -57,7 +57,7 @@ public class BattleManager : MonoBehaviour
 
     int MaxProgressionNum = 8;
     List<Chord> progression = new List<Chord>();
-    List<DegreeProgression> DegreeProgressions = new List<DegreeProgression>();
+    List<DegreeProgression> DegreeProgressionList = new List<DegreeProgression>();
     List<Chord> progpart = new List<Chord>();
 
     List<Chord> currentChoices = new List<Chord>();
@@ -87,7 +87,7 @@ public class BattleManager : MonoBehaviour
         key = NoteData.C;
 
         chords = ChordManager.CreateTriadDiatonic(key);
-        DegreeProgressions = ProgressionManager.CreateDegreeProgression();
+        DegreeProgressionList = ProgressionManager.CreateDegreeProgression();
 
 
         FProgressionList = new List<FProgressionData>()
@@ -479,7 +479,7 @@ public class BattleManager : MonoBehaviour
         Gstate = GameState.Finished;
     }
 
-    bool MatchDegreeProgression(DegreeProgression prog)
+    /*bool MatchDegreeProgression(DegreeProgression prog)
     {
         if (progression.Count < prog.pattern.Length) return false;
 
@@ -525,17 +525,17 @@ public class BattleManager : MonoBehaviour
         }
 
         return false;
-    }
+    }*/
 
     int CalculateDamage()
     {
         int damage = 0;
 
-        foreach (var p in DegreeProgressions)
+        foreach (var p in DegreeProgressionList)
         {
-            if (MatchDegreeProgression(p))
+            if (BattleCalculator.MatchDegreeProgression(progpart, progression, p.pattern))
             {
-                int CalcResult = CalculateDegreeProgressionModifier(p, progpart);
+                int CalcResult = BattleCalculator.CalculateDegreeProgressionModifier(p, progpart);
                 damage += CalcResult;
                 Modifier += $"Degree: {p.name} (+{CalcResult})\n";
                 DegreeProgressionCounter += p.pattern.Length;
@@ -545,12 +545,12 @@ public class BattleManager : MonoBehaviour
         
         if(DegreeProgressionCounter == 0)
         {
-            foreach (var c in FProgressionList)
+            foreach (var p in FProgressionList)
             {
-                if (MatchFProgression(c.pattern))
+                if (BattleCalculator.MatchFProgression(progression, p.pattern))
                 {
-                    damage += c.damage;
-                    Modifier += $"F : {c.name} (+{c.damage})\n";
+                    damage += p.damage;
+                    Modifier += $"F : {p.name} (+{p.damage})\n";
                     FProgressionCounter++;
                 }
             }
@@ -571,13 +571,13 @@ public class BattleManager : MonoBehaviour
         
         return damage;
     }
-    int CalculateDegreeProgressionModifier(DegreeProgression p, List<Chord> prog)
+    /*int CalculateDegreeProgressionModifier(DegreeProgression p, List<Chord> prog)
     {
         int DegreeProgressionModifier = prog.Sum(s => s.Damage());
         DegreeProgressionModifier *= p.Multiplier();
 
         return DegreeProgressionModifier;
-    }
+    }*/
 
     void NextTurn()
     {
@@ -586,7 +586,8 @@ public class BattleManager : MonoBehaviour
         Modifier = "";
         DegreeProgressionCounter = 0;
         FProgressionCounter = 0;
-        progpart = new List<Chord>();
+        progression.Clear();
+        progpart.Clear();
 
         UpdateUI();
         StartSelectingPhase();

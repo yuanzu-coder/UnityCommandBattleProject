@@ -3,7 +3,7 @@ public class FProgressionData
 {
     public string name;
     public ChordFunction[] pattern;
-    public int damage; 
+    public int damage;
 }
 public class DegreeProgression
 {
