@@ -1,5 +1,5 @@
 [System.Serializable]
-public class FProgressionData
+public class FProgression
 {
     public string name;
     public ChordFunction[] pattern;

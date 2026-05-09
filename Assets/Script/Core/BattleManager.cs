@@ -29,9 +29,7 @@ public class BattleManager : MonoBehaviour
     int enemyHP;
     int FastSelectDamageBonus;
     int FastSelectScoreBonus;
-    int DegreeProgressionCounter;
-    int FProgressionCounter;
-    int ProgressionBonus;
+    int ProgressionScoreBonus;
     int finalScore;
     int sumDamage;
 
@@ -58,7 +56,7 @@ public class BattleManager : MonoBehaviour
     int MaxProgressionNum = 8;
     List<Chord> progression = new List<Chord>();
     List<DegreeProgression> DegreeProgressionList = new List<DegreeProgression>();
-    List<Chord> progpart = new List<Chord>();
+    
 
     List<Chord> currentChoices = new List<Chord>();
     Chord nextChoice;
@@ -66,7 +64,7 @@ public class BattleManager : MonoBehaviour
     public GameObject chordButtonPrefab;
     public Transform chordButtonParent;
 
-    List<FProgressionData> FProgressionList = new List<FProgressionData>();
+    List<FProgression> FProgressionList = new List<FProgression>();
 
     string Modifier = "";
 
@@ -90,23 +88,23 @@ public class BattleManager : MonoBehaviour
         DegreeProgressionList = ProgressionManager.CreateDegreeProgression();
 
 
-        FProgressionList = new List<FProgressionData>()
+        FProgressionList = new List<FProgression>()
         {
-            new FProgressionData
+            new FProgression
             {
                 name = "SD-D-T",
                 pattern = new []
                 { ChordFunction.SD, ChordFunction.D, ChordFunction.T },
                 damage = 40
             },
-            new FProgressionData
+            new FProgression
             {
                 name = "Deceptive Cadence (to D)",
                 pattern = new []
                 { ChordFunction.D, ChordFunction.D },
                 damage = 20
             },
-            new FProgressionData
+            new FProgression
             {
                 name = "Deceptive Cadence (to SD)",
                 pattern = new []
@@ -201,8 +199,6 @@ public class BattleManager : MonoBehaviour
                 NextTurn();
             }
         }
-
-        
     }
 
     public void InitGame()
@@ -213,8 +209,7 @@ public class BattleManager : MonoBehaviour
         FastSelectScoreBonus = 0;
         currentTurn = 1;
         enemyHP = MaxEnemyHP;
-        FProgressionCounter = 0;
-        ProgressionBonus = 0;
+        ProgressionScoreBonus = 0;
         finalScore = 0;
         sumDamage = 0;
 
@@ -318,7 +313,14 @@ public class BattleManager : MonoBehaviour
     {
         Gstate = GameState.Calculating;
         NextPhase(measureDuration * 4);
-        sumDamage = CalculateDamage();
+        sumDamage = BattleCalculator.CalculateDamage(
+        progression,
+        DegreeProgressionList,
+        FProgressionList,
+        FastSelectDamageBonus,
+        ref ProgressionScoreBonus,
+        ref Modifier
+    );
         UpdateUI();
     }
     void StartExecutingPhase()
@@ -525,11 +527,12 @@ public class BattleManager : MonoBehaviour
         }
 
         return false;
-    }*/
+    }
 
     int CalculateDamage()
     {
         int damage = 0;
+        List<Chord> progpart = new List<Chord>();
 
         foreach (var p in DegreeProgressionList)
         {
@@ -567,11 +570,11 @@ public class BattleManager : MonoBehaviour
             Modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
         }
 
-        ProgressionBonus += 2 * DegreeProgressionCounter + FProgressionCounter;
+        ProgressionScoreBonus += 2 * DegreeProgressionCounter + FProgressionCounter;
         
         return damage;
     }
-    /*int CalculateDegreeProgressionModifier(DegreeProgression p, List<Chord> prog)
+    int CalculateDegreeProgressionModifier(DegreeProgression p, List<Chord> prog)
     {
         int DegreeProgressionModifier = prog.Sum(s => s.Damage());
         DegreeProgressionModifier *= p.Multiplier();
@@ -584,10 +587,9 @@ public class BattleManager : MonoBehaviour
         currentTurn++;
         
         Modifier = "";
-        DegreeProgressionCounter = 0;
-        FProgressionCounter = 0;
+        /*DegreeProgressionCounter = 0;
+        FProgressionCounter = 0;*/
         progression.Clear();
-        progpart.Clear();
 
         UpdateUI();
         StartSelectingPhase();
@@ -601,7 +603,7 @@ public class BattleManager : MonoBehaviour
             score += (maxTurn - currentTurn + 1) * 2000;
             score += FastSelectScoreBonus * 20;
         }
-        score += ProgressionBonus * 50;
+        score += ProgressionScoreBonus * 50;
         
 
         return Mathf.RoundToInt(score);

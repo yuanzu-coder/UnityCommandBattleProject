@@ -4,6 +4,61 @@ using UnityEngine;
 
 public static class BattleCalculator
 {
+    public static int CalculateDamage(
+        List<Chord> progression,
+        List<DegreeProgression> DegreeProgressionList,
+        List<FProgression> FProgressionList,
+        int FastSelectDamageBonus,
+
+        ref int ProgressionScoreBonus,
+        ref string Modifier
+    )
+    {
+        int damage = 0;
+        List<Chord> progpart = new List<Chord>();
+        int DegreeProgressionCounter = 0;
+        int FProgressionCounter = 0;
+
+        foreach (var p in DegreeProgressionList)
+        {
+            if (BattleCalculator.MatchDegreeProgression(progpart, progression, p.pattern))
+            {
+                int CalcResult = BattleCalculator.CalculateDegreeProgressionModifier(p, progpart);
+                damage += CalcResult;
+                Modifier += $"Degree: {p.name} (+{CalcResult})\n";
+                DegreeProgressionCounter += p.pattern.Length;
+            }
+            if(DegreeProgressionCounter != 0) break;
+        }
+        
+        if(DegreeProgressionCounter == 0)
+        {
+            foreach (var p in FProgressionList)
+            {
+                if (BattleCalculator.MatchFProgression(progression, p.pattern))
+                {
+                    damage += p.damage;
+                    Modifier += $"F : {p.name} (+{p.damage})\n";
+                    FProgressionCounter++;
+                }
+            }
+        }
+        
+        foreach (var c in progression)
+        {
+            damage += c.Damage();
+        }
+
+        damage += FastSelectDamageBonus * 10;
+        if(FastSelectDamageBonus != 0)
+        {
+            Modifier += $"Fast Select Bonus: +{FastSelectDamageBonus * 10}";
+        }
+
+        ProgressionScoreBonus += 2 * DegreeProgressionCounter + FProgressionCounter;
+        
+        return damage;
+    }
     public static int CalculateDegreeProgressionModifier(
         DegreeProgression p,
         List<Chord> progpart
