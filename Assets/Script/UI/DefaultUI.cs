@@ -94,7 +94,7 @@ public class DefaultUI : MonoBehaviour
     )
     {
         phaseText.text = ""; 
-        if (Gstate == GameState.Selecting) phaseText.text = "Composing";
+        if (Gstate == GameState.Selecting || Gstate == GameState.Waiting) phaseText.text = "Composing";
         else if (Gstate == GameState.Calculating) phaseText.text = "Playing";
         else if (Gstate == GameState.Preparing) phaseText.text = "Preparing";
     }

@@ -8,7 +8,7 @@ using System.Linq;
 public class BattleManager : MonoBehaviour
 {
     [SerializeField] DefaultUI defaultUI;
-    [SerializeField] RhythmManager rythmManager;
+    [SerializeField] RhythmManager rhythmManager;
     public NoteData key;
     public AudioSource[] audioSources;
     int audioIndex = 0;
@@ -16,9 +16,9 @@ public class BattleManager : MonoBehaviour
     double nextTickTime;
     bool isMetronomeRunning;
 
-    public float BPM = 120f;
+    /*public float BPM = 120f;
     float beatDuration;     // 1拍
-    float measureDuration;  // 1小節
+    float measureDuration;  // 1小節*/
     double phaseStartTime;
     float phaseDuration;
 
@@ -33,41 +33,26 @@ public class BattleManager : MonoBehaviour
     int finalScore;
     int sumDamage;
 
-    /*public TextMeshProUGUI keyText;
-    public TextMeshProUGUI turnCountText;
-    public TextMeshProUGUI phaseText;
-    public TextMeshProUGUI enemyHPText;
-    public TextMeshProUGUI selectedChordsText;
-    public TextMeshProUGUI progressionLengthText;
-    public TextMeshProUGUI nextChoiceText;
-    public TextMeshProUGUI damageText;
-    public TextMeshProUGUI errorText;
-    public TextMeshProUGUI resultText;
-    public TextMeshProUGUI modifierText;*/
-
     List<string> errors = new List<string>();
 
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI beatText;
 
     public UnityEngine.UI.Button confirmButton;
-    
-    Chord C, Dm, Em, F, G, Am, Bdim;
+
     List<Chord> chords = new List<Chord>();
 
 
     int MaxProgressionLength = 8;
     List<Chord> progression = new List<Chord>();
     List<DegreeProgression> DegreeProgressionList = new List<DegreeProgression>();
-    
+    List<FProgression> FProgressionList = new List<FProgression>();
 
     List<Chord> currentChoices = new List<Chord>();
     Chord nextChoice;
     public int choiceCount = 5;
     public GameObject chordButtonPrefab;
     public Transform chordButtonParent;
-
-    List<FProgression> FProgressionList = new List<FProgression>();
 
     List<string> modifier = new List<string>();
 
@@ -103,7 +88,7 @@ public class BattleManager : MonoBehaviour
 
                 audioIndex = (audioIndex + 1) % audioSources.Length;
 
-                nextTickTime += beatDuration;
+                nextTickTime += rhythmManager.BeatDuration;
             }
         }
 
@@ -118,7 +103,7 @@ public class BattleManager : MonoBehaviour
         }
         else if (Gstate == GameState.Preparing)
         {
-            float remain = GetRemainingTime();
+            float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
             UpdateCountDownUI();
 
             if (remain <= 0f)
@@ -129,7 +114,7 @@ public class BattleManager : MonoBehaviour
         }
         else if (Gstate == GameState.Selecting)
         {
-            float remain = GetRemainingTime();
+            float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
             UpdateBeatUI();
 
             if (remain <= 0f)
@@ -142,7 +127,7 @@ public class BattleManager : MonoBehaviour
         }
         else if (Gstate == GameState.Waiting)
         {
-            float remain = GetRemainingTime();
+            float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
             UpdateBeatUI();
 
             if (remain <= 0f)
@@ -153,7 +138,7 @@ public class BattleManager : MonoBehaviour
         }
         else if (Gstate == GameState.Calculating)
         {
-            float remain = GetRemainingTime();
+            float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
             UpdateBeatUI();
 
             if (remain <= 0f)
@@ -167,6 +152,7 @@ public class BattleManager : MonoBehaviour
     public void InitGame()
     {
         Gstate = GameState.Start;
+        Fstate = FinishState.Unfinish;
         FastSelectDamageBonus = 0;
         FastSelectScoreBonus = 0;
         currentTurn = 0;
@@ -177,11 +163,6 @@ public class BattleManager : MonoBehaviour
 
         countDownText.text = "";
         beatText.text = "";
-        /*nextChoiceText.text = "";
-        damageText.text = "";
-        modifierText.text = "";
-        errorText.text = "";
-        resultText.text = "";*/
         
         defaultUI.UpdateAllUI(
         key,
@@ -198,8 +179,9 @@ public class BattleManager : MonoBehaviour
         Fstate,
         ref errors);
 
-        StartGame();
-        InitMusicTiming();
+        rhythmManager.SetGameStartTime(ref phaseStartTime);
+        /*StartGame();
+        InitMusicTiming();*/
         StartMetronome(phaseStartTime);
     }
 
@@ -247,7 +229,7 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        float confirmRemainTime = GetRemainingTime();
+        float confirmRemainTime = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
         FastSelectDamageBonus = Mathf.RoundToInt(confirmRemainTime);
         FastSelectScoreBonus += Mathf.RoundToInt(confirmRemainTime);
         Gstate = GameState.Waiting;
@@ -259,30 +241,30 @@ public class BattleManager : MonoBehaviour
         isMetronomeRunning = true;
     }
 
-    void InitMusicTiming()
+    /*void InitMusicTiming()
     {
-        beatDuration = 60f / BPM;
-        measureDuration = beatDuration * 4f;
+        rhythmManager.BeatDuration = 60f / BPM;
+        rhythmManager.MeasureDuration = rhythmManager.BeatDuration * 4f;
     }
     void StartGame()
     {
-        Gstate = GameState.Start;
-        Fstate = FinishState.Unfinish;
+        
         phaseStartTime = AudioSettings.dspTime + 0.1;
     }
     void NextPhase(float duration)
     {
         phaseStartTime += phaseDuration;
         phaseDuration = duration;
-    }
+    }*/
 
     void StartPreparingPhase()
     {
-        Gstate = GameState.Preparing;
-        defaultUI.UpdatePhaseUI(Gstate);
         defaultUI.UpdateErrorUI(ref errors);
 
-        NextPhase(measureDuration * 2);
+        Gstate = GameState.Preparing;
+        defaultUI.UpdatePhaseUI(Gstate);
+        rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
+        /*NextPhase(rhythmManager.MeasureDuration * 2);*/
 
         GenerateChoices();
         GenerateChordButtons();
@@ -296,16 +278,18 @@ public class BattleManager : MonoBehaviour
 
         Gstate = GameState.Selecting;
         defaultUI.UpdatePhaseUI(Gstate);
+        rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
+        /*NextPhase(rhythmManager.MeasureDuration * 4);*/
 
-        NextPhase(measureDuration * 4);
         defaultUI.UpdateSelecting(nextChoice, MaxProgressionLength, progression);
     }
     void StartCalculatingPhase()
     {
         Gstate = GameState.Calculating;
         defaultUI.UpdatePhaseUI(Gstate);
+        rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
+        /*NextPhase(rhythmManager.MeasureDuration * 4);*/
 
-        NextPhase(measureDuration * 4);
         sumDamage = BattleCalculator.CalculateDamage(
         progression,
         DegreeProgressionList,
@@ -323,13 +307,13 @@ public class BattleManager : MonoBehaviour
 
         ExecuteAction();
     }
-    float GetRemainingTime()
+    /*float GetRemainingTime()
     {
         double elapsed = AudioSettings.dspTime - phaseStartTime;
         float remain = phaseDuration - (float)elapsed;
 
         return Mathf.Max(0f, remain);
-    }
+    }*/
 
     void AutoConfirm()
     {
@@ -547,7 +531,7 @@ public class BattleManager : MonoBehaviour
     {
         double elapsed = AudioSettings.dspTime - phaseStartTime;
 
-        int beat = Mathf.FloorToInt((float)((phaseDuration - elapsed) / beatDuration));
+        int beat = Mathf.FloorToInt((float)((phaseDuration - elapsed) / rhythmManager.BeatDuration));
         int count = beat / 2 + 1;
         if (count <= 3)
         {
@@ -558,7 +542,7 @@ public class BattleManager : MonoBehaviour
     {
         double elapsed = AudioSettings.dspTime - phaseStartTime;
 
-        int beat = Mathf.FloorToInt((float)(elapsed / beatDuration));
+        int beat = Mathf.FloorToInt((float)(elapsed / rhythmManager.BeatDuration));
         int currentMeasure = beat / 4 + 1;
         int beatInMeasure = beat % 4 + 1;
 
