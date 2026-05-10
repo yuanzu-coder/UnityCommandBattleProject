@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class RhythmManager : MonoBehaviour
 {
-    public float BPM = 120f;
-    public int Meter = 4;
+    float BPM = 120f;
+    int Meter = 4;
     
     public float BeatDuration { get; private set;} 
     public float MeasureDuration { get; private set;}
@@ -33,13 +33,14 @@ public class RhythmManager : MonoBehaviour
 
         BeatDuration = 60f/ BPM;
         MeasureDuration = BeatDuration * Meter;
+        
     }
 
     public void SetGameStartTime(
         ref double phaseStartTime
     )
     {
-        phaseStartTime = CurrentDSPTime + 1;
+        phaseStartTime = CurrentDSPTime + 2;
     }
 
     public float GetPhaseDuration(
@@ -62,7 +63,7 @@ public class RhythmManager : MonoBehaviour
                 break;
         }
 
-        return measureNum;
+        return MeasureDuration * measureNum;
     }
 
     public void NextPhase(

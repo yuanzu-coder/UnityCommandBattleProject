@@ -97,16 +97,16 @@ public class DefaultUI : MonoBehaviour
         switch (Gstate)
         {
             case GameState.Preparing: 
-                phase = "Composing";
+                phase = "Preparing";
                 break;
             
             case GameState.Selecting:
             case GameState.Waiting:
-                phase = "Playing";
+                phase = "Composing";
                 break;
                 
             case GameState.Calculating:
-                phase = "Preparing";
+                phase = "Playing";
                 break;
         }
 
