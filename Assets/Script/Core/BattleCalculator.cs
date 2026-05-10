@@ -48,12 +48,15 @@ public static class BattleCalculator
             damage += c.Damage();
         }
 
-        damage += FastSelectDamageBonus * 10;
-        if(FastSelectDamageBonus != 0)
+        if (progression.Count != 0)
         {
-            modifier.Add($"Fast Select Bonus: +{FastSelectDamageBonus * 10}");
+            damage += FastSelectDamageBonus * 10;
+            if(FastSelectDamageBonus != 0)
+            {
+                modifier.Add($"Fast Select Bonus: +{FastSelectDamageBonus * 10}");
+            }
         }
-
+        
         ProgressionScoreBonus += 2 * DegreeProgressionCounter + FProgressionCounter;
         
         return damage;

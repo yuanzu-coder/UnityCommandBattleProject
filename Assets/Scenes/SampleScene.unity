@@ -640,6 +640,61 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 162272084}
   m_CullTransparentMesh: 1
+--- !u!1 &226762712
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 226762714}
+  - component: {fileID: 226762713}
+  m_Layer: 0
+  m_Name: DefaultUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &226762713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226762712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95c45420e34924587bc68d7069a75d56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DefaultUI
+  keyText: {fileID: 635766952}
+  turnCountText: {fileID: 1351600433}
+  phaseText: {fileID: 1634850932}
+  nextChoiceText: {fileID: 1738623631}
+  progressionCountText: {fileID: 1132719740}
+  selectedChordsText: {fileID: 1799096795}
+  damageText: {fileID: 1909247267}
+  modifierText: {fileID: 12452577}
+  enemyHPText: {fileID: 1157763257}
+  resultText: {fileID: 719093447}
+  errorText: {fileID: 1674286761}
+--- !u!4 &226762714
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226762712}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 908.9114, y: 511.30194, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &272967177
 GameObject:
   m_ObjectHideFlags: 0
@@ -3720,17 +3775,17 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1002492622}
   - {fileID: 1224390438}
-  - {fileID: 1284252231}
-  - {fileID: 1843282036}
   - {fileID: 1325899856}
+  - {fileID: 1843282036}
+  - {fileID: 891492558}
   - {fileID: 1307070167}
   - {fileID: 1710367288}
-  - {fileID: 891492558}
   - {fileID: 1909247265}
-  - {fileID: 719093446}
   - {fileID: 12452575}
+  - {fileID: 1284252231}
+  - {fileID: 719093446}
+  - {fileID: 1002492622}
   - {fileID: 1271751134}
   - {fileID: 272967178}
   - {fileID: 1674286763}
@@ -4507,7 +4562,7 @@ GameObject:
   - component: {fileID: 1710367290}
   - component: {fileID: 1710367289}
   m_Layer: 5
-  m_Name: SkillPanel
+  m_Name: ChordPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5141,7 +5196,7 @@ GameObject:
   - component: {fileID: 1832586692}
   - component: {fileID: 1832586691}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: BattleManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5159,7 +5214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 133a28ed89a1e40b597ff842e0c9db65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleManager
-  ui: {fileID: 0}
+  defaultUI: {fileID: 226762713}
   key: 0
   audioSources:
   - {fileID: 1756978401}
@@ -5169,18 +5224,7 @@ MonoBehaviour:
   clickSound: {fileID: 8300000, guid: 5e3c9aa636868457682d71702413a99e, type: 3}
   BPM: 120
   countDownText: {fileID: 1002492624}
-  keyText: {fileID: 635766952}
-  turnCountText: {fileID: 1351600433}
-  phaseText: {fileID: 1634850932}
   beatText: {fileID: 1271751136}
-  enemyHPText: {fileID: 1157763257}
-  selectedChordsText: {fileID: 1799096795}
-  progressionNumText: {fileID: 1132719740}
-  nextChoiceText: {fileID: 1738623631}
-  damageText: {fileID: 1909247267}
-  errorText: {fileID: 1674286761}
-  resultText: {fileID: 719093447}
-  modifierText: {fileID: 12452577}
   confirmButton: {fileID: 1078943372}
   choiceCount: 5
   chordButtonPrefab: {fileID: 4384153888382200190, guid: c0df041a6cf014a76a8bd7ae4ff73b71, type: 3}
@@ -5823,3 +5867,4 @@ SceneRoots:
   - {fileID: 133635272}
   - {fileID: 1832586692}
   - {fileID: 27531434}
+  - {fileID: 226762714}

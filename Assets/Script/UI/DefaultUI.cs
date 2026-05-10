@@ -40,12 +40,12 @@ public class DefaultUI : MonoBehaviour
         UpdateTurnUI(maxTurn, currentTurn);
         UpdatePhaseUI(Gstate);
         UpdateNextChoiceUI(nextChoice);
-        UpdateSelctedChordCountUI(MaxProgressionLength,progression);
+        UpdateSelctedChordCountUI(MaxProgressionLength, progression);
         UpdateSelectedChordsListUI(progression);
         UpdateDamageUI(sumDamage, Gstate);
-        UpdateModifierUI(modifier);
+        UpdateModifierUI(modifier, Gstate);
         UpdateEnemyHPUI(enemyHP);
-        UpdateResultUI(finalScore,Fstate);
+        UpdateResultUI(finalScore, Fstate, Gstate);
         UpdateErrorUI(ref errors);
     }
 
@@ -69,7 +69,7 @@ public class DefaultUI : MonoBehaviour
     )
     {
         UpdateDamageUI(sumDamage, Gstate);
-        UpdateModifierUI(modifier);
+        UpdateModifierUI(modifier, Gstate);
         UpdateEnemyHPUI(enemyHP);
     }
 
@@ -96,7 +96,7 @@ public class DefaultUI : MonoBehaviour
         phaseText.text = ""; 
         if (Gstate == GameState.Selecting) phaseText.text = "Composing";
         else if (Gstate == GameState.Calculating) phaseText.text = "Playing";
-        else if (Gstate == GameState.Executing) phaseText.text = "Preparing";
+        else if (Gstate == GameState.Preparing) phaseText.text = "Preparing";
     }
 
     public void UpdateNextChoiceUI(
@@ -106,7 +106,6 @@ public class DefaultUI : MonoBehaviour
         nextChoiceText.text = "";
         if (nextChoice != null) nextChoiceText.text = nextChoice.name;
     }
-
     public void UpdateSelctedChordCountUI(
         int MaxProgressionLength,
         List<Chord> progression
@@ -114,7 +113,6 @@ public class DefaultUI : MonoBehaviour
     {
         progressionCountText.text = progression.Count + "/" +  MaxProgressionLength;
     }
-
     public void UpdateSelectedChordsListUI(
         List<Chord> progression
     )
@@ -133,15 +131,18 @@ public class DefaultUI : MonoBehaviour
         damageText.text = "";
         if (Gstate == GameState.Executing) damageText.text = sumDamage + " damage";
     }
-
     public void UpdateModifierUI(
-        List<string> modifier
+        List<string> modifier,
+        GameState Gstate
     )
-    {   
+    {
         modifierText.text = "";
-        if (modifier.Count != 0) modifierText.text = "BornusDamage\n";
-        for(int i = 0; i < modifier.Count; i++){
-            modifierText.text = modifier[i] + "\n";
+        if (Gstate == GameState.Executing)
+        {
+            if (modifier.Count != 0) modifierText.text = "BornusDamage\n";
+            for(int i = 0; i < modifier.Count; i++){
+                modifierText.text += modifier[i] + "\n";
+            }
         }
     }
 
@@ -154,18 +155,22 @@ public class DefaultUI : MonoBehaviour
 
     public void UpdateResultUI(
         int finalScore,
-        FinishState Fstate
+        FinishState Fstate,
+        GameState Gstate
     )
     {
         resultText.text = "";
-        switch (Fstate)
+        if (Gstate == GameState.Result)
         {
-            case FinishState.CREAR:
-                resultText.text = "SCORE: " + finalScore;
-                break;
-            case FinishState.TURNOVER:
-                resultText.text = "TURNOVER\nSCORE: " + finalScore;
-                break;  
+            switch (Fstate)
+            {
+                case FinishState.CREAR:
+                    resultText.text = "SCORE: " + finalScore;
+                    break;
+                case FinishState.TURNOVER:
+                    resultText.text = "TURNOVER\nSCORE: " + finalScore;
+                    break;  
+            }
         }
     }
     
