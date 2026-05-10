@@ -7,6 +7,9 @@ public class RhythmManager : MonoBehaviour
     
     public float BeatDuration { get; private set;} 
     public float MeasureDuration { get; private set;}
+    public int BeatInMeasure {get; private set;}
+    public int CurrentMeasure {get; private set;}
+    public int Count {get; private set;}
 
     public double CurrentDSPTime
         => AudioSettings.dspTime;
@@ -71,5 +74,28 @@ public class RhythmManager : MonoBehaviour
         float remain = phaseDuration - (float)elapsed;
 
         return Mathf.Max(0f, remain);
+    }
+
+    public void CalcCountDown(
+        double phaseStartTime,
+        float phaseDuration,
+        GameState Gstate
+    )
+    {
+        double elapsed = CurrentDSPTime - phaseStartTime;
+
+        int beat = Mathf.FloorToInt((float)((phaseDuration - elapsed) / BeatDuration));
+        Count = beat / 2 + 1;
+    }
+
+    public void CalcBeat(
+        double phaseStartTime
+    )
+    {
+        double elapsed = CurrentDSPTime - phaseStartTime;
+
+        int beat = Mathf.FloorToInt((float)(elapsed / BeatDuration));
+        CurrentMeasure = beat / 4 + 1;
+        BeatInMeasure = beat % 4 + 1;
     }
 }

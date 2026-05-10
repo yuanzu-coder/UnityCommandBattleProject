@@ -8,7 +8,9 @@ using System.Linq;
 public class BattleManager : MonoBehaviour
 {
     [SerializeField] DefaultUI defaultUI;
+    [SerializeField] TimerUI timerUI;
     [SerializeField] RhythmManager rhythmManager;
+    
     public NoteData key;
     public AudioSource[] audioSources;
     int audioIndex = 0;
@@ -103,7 +105,8 @@ public class BattleManager : MonoBehaviour
         else if (Gstate == GameState.Preparing)
         {
             float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-            UpdateCountDownUI();
+            rhythmManager.CalcCountDown(phaseStartTime, phaseDuration, Gstate);
+            timerUI.UpdateCountDownUI(3);
 
             if (remain <= 0f)
             {
@@ -114,7 +117,8 @@ public class BattleManager : MonoBehaviour
         else if (Gstate == GameState.Selecting)
         {
             float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-            UpdateBeatUI();
+            rhythmManager.CalcBeat(phaseStartTime);
+            timerUI.UpdateBeatUI();
 
             if (remain <= 0f)
             {
@@ -127,7 +131,8 @@ public class BattleManager : MonoBehaviour
         else if (Gstate == GameState.Waiting)
         {
             float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-            UpdateBeatUI();
+            rhythmManager.CalcBeat(phaseStartTime);
+            timerUI.UpdateBeatUI();
 
             if (remain <= 0f)
             {
@@ -138,7 +143,8 @@ public class BattleManager : MonoBehaviour
         else if (Gstate == GameState.Calculating)
         {
             float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-            UpdateBeatUI();
+            rhythmManager.CalcBeat(phaseStartTime);
+            timerUI.UpdateBeatUI();
 
             if (remain <= 0f)
             {
@@ -443,88 +449,5 @@ public class BattleManager : MonoBehaviour
         
         Gstate = GameState.Finished;
         isMetronomeRunning = false;
-    }
-
-    void UpdateUI()
-    {
-        /*keyText.text = "Key: " + ChordManager.GetNoteName(key);
-        progressionLengthText.text = progression.Count + "/" +  MaxProgressionLength;
-
-        confirmButton.interactable = progression.Count > 0;
-
-        if (progression.Count == 0)
-        {
-            selectedChordsText.text = "No Chord";
-        }
-        else
-        {
-            selectedChordsText.text = "";
-            for(int i = 0; i < progression.Count; i++){
-                selectedChordsText.text += $"{i + 1}: {progression[i].name}\n";
-            }
-        }
-
-        enemyHPText.text = "Enemy HP: " + enemyHP;
-
-        if (Gstate == GameState.Selecting)
-        {
-            phaseText.text = "Composing:";
-            if (progression.Count != 0) errorText.text = "";
-            turnCountText.text = "Turn: " + currentTurn + "/" + maxTurn;
-            countDownText.text = "";
-        }
-
-        if (Gstate == GameState.Calculating)
-        {
-            phaseText.text = "Playing:";
-        }
-
-        if (Gstate == GameState.Executing)
-        {
-            beatText.text = "";
-            phaseText.text = "Preparing:";
-            damageText.text = sumDamage + " damage";
-            if (modifier != "") modifierText.text = "BornusDamage\n" + modifier;
-        }
-
-        if (Gstate == GameState.Result)
-        {
-            beatText.text = "";
-            switch (Fstate)
-            {
-                case FinishState.CREAR:
-                    resultText.text = "SCORE: " + finalScore;
-                    break;
-                case FinishState.TURNOVER:
-                    resultText.text = "TURNOVER\nSCORE: " + finalScore;
-                    break;  
-            }
-        }*/
-    }
-
-    void UpdateTimerUI(TextMeshProUGUI timerText, float timer)
-    {
-        timerText.text = Mathf.Floor(timer).ToString();
-    }
-    void UpdateCountDownUI()
-    {
-        double elapsed = AudioSettings.dspTime - phaseStartTime;
-
-        int beat = Mathf.FloorToInt((float)((phaseDuration - elapsed) / rhythmManager.BeatDuration));
-        int count = beat / 2 + 1;
-        if (count <= 3)
-        {
-            countDownText.text = $"{count}";
-        }
-    }
-    void UpdateBeatUI()
-    {
-        double elapsed = AudioSettings.dspTime - phaseStartTime;
-
-        int beat = Mathf.FloorToInt((float)(elapsed / rhythmManager.BeatDuration));
-        int currentMeasure = beat / 4 + 1;
-        int beatInMeasure = beat % 4 + 1;
-
-        beatText.text = $"{currentMeasure}:  {beatInMeasure}";
     }
 }

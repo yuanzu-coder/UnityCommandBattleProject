@@ -17,9 +17,9 @@ public class DefaultUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI enemyHPText;
 
     [SerializeField] TextMeshProUGUI resultText;
-    
 
     [SerializeField] TextMeshProUGUI errorText;
+
     public void UpdateAllUI(
         NoteData key,
         int maxTurn,
@@ -183,5 +183,5 @@ public class DefaultUI : MonoBehaviour
             errorText.text += errors[i] + "\n";
         }
         errors.Clear();
-    }   
+    }
 }
