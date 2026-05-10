@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ClickBeatAudio
+public class ChordButtonUI
 {
     
 }

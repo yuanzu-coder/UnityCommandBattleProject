@@ -39,7 +39,7 @@ public class RhythmManager : MonoBehaviour
         ref double phaseStartTime
     )
     {
-        phaseStartTime = CurrentDSPTime + 0.1;
+        phaseStartTime = CurrentDSPTime + 1;
     }
 
     public float GetPhaseDuration(

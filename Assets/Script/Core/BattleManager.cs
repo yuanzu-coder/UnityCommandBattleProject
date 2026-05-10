@@ -3,27 +3,20 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 
-
-
 public class BattleManager : MonoBehaviour
 {
     [SerializeField] DefaultUI defaultUI;
     [SerializeField] TimerUI timerUI;
     [SerializeField] RhythmManager rhythmManager;
+    [SerializeField] MetronomeManager metronomeManager;
     
-    public NoteData key;
-    public AudioSource[] audioSources;
-    int audioIndex = 0;
-    public AudioClip clickSound;
-    double nextTickTime;
-    bool isMetronomeRunning;
-
+    
     double phaseStartTime;
     float phaseDuration;
 
+    public NoteData key;
     int maxTurn = 4;
     int currentTurn;
-
     int MaxEnemyHP = 1000;
     int enemyHP;
     int FastSelectDamageBonus;
@@ -76,24 +69,9 @@ public class BattleManager : MonoBehaviour
 
     void Update()
     {
-        if (isMetronomeRunning)
-        {
-            double dspTime = AudioSettings.dspTime;
+        metronomeManager.PlayMetronome();
 
-            while (nextTickTime < dspTime + 0.5)
-            {
-                AudioSource src = audioSources[audioIndex];
-
-                src.clip = clickSound;
-                src.PlayScheduled(nextTickTime);
-
-                audioIndex = (audioIndex + 1) % audioSources.Length;
-
-                nextTickTime += rhythmManager.BeatDuration;
-            }
-        }
-
-        if (AudioSettings.dspTime < phaseStartTime)
+        if (rhythmManager.CurrentDSPTime < phaseStartTime)
         {
             return;
         }
@@ -187,7 +165,7 @@ public class BattleManager : MonoBehaviour
         ref errors);
 
         rhythmManager.SetGameStartTime(ref phaseStartTime);
-        StartMetronome(phaseStartTime);
+        metronomeManager.StartMetronome(phaseStartTime);
     }
 
     public void SelectChord(int index)
@@ -253,12 +231,6 @@ public class BattleManager : MonoBehaviour
 
         isConfirmed = true;
         ConfirmSelection();
-    }
-
-    void StartMetronome(double startTime)
-    {
-        nextTickTime = startTime;
-        isMetronomeRunning = true;
     }
 
     void StartPreparingPhase()
@@ -359,8 +331,6 @@ public class BattleManager : MonoBehaviour
                 SelectChord(index);
             });
         }
-
-
     }
 
     void RefillChoices()
@@ -448,6 +418,6 @@ public class BattleManager : MonoBehaviour
         defaultUI.UpdateResultUI(finalScore, Fstate, Gstate);
         
         Gstate = GameState.Finished;
-        isMetronomeRunning = false;
+        metronomeManager.StopMetronome();
     }
 }
