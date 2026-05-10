@@ -16,9 +16,6 @@ public class BattleManager : MonoBehaviour
     double nextTickTime;
     bool isMetronomeRunning;
 
-    /*public float BPM = 120f;
-    float beatDuration;     // 1拍
-    float measureDuration;  // 1小節*/
     double phaseStartTime;
     float phaseDuration;
 
@@ -53,6 +50,8 @@ public class BattleManager : MonoBehaviour
     public int choiceCount = 5;
     public GameObject chordButtonPrefab;
     public Transform chordButtonParent;
+
+    bool isConfirmed;
 
     List<string> modifier = new List<string>();
 
@@ -161,6 +160,8 @@ public class BattleManager : MonoBehaviour
         finalScore = 0;
         sumDamage = 0;
 
+        isConfirmed = false;
+
         countDownText.text = "";
         beatText.text = "";
         
@@ -180,8 +181,6 @@ public class BattleManager : MonoBehaviour
         ref errors);
 
         rhythmManager.SetGameStartTime(ref phaseStartTime);
-        /*StartGame();
-        InitMusicTiming();*/
         StartMetronome(phaseStartTime);
     }
 
@@ -208,6 +207,7 @@ public class BattleManager : MonoBehaviour
 
         progression.RemoveAt(progression.Count - 1);
         defaultUI.UpdateSelecting(nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateErrorUI(ref errors);
     }
 
     public void ClearProgression()
@@ -217,22 +217,36 @@ public class BattleManager : MonoBehaviour
 
         progression.Clear();
         defaultUI.UpdateSelecting(nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateErrorUI(ref errors);
     }
 
     public void ConfirmSelection()
     {
-        if(Gstate != GameState.Selecting) 
+        if(Gstate != GameState.Selecting) return;
+
         if(progression.Count == 0)
         {
             errors.Add("Any Chord is not selected!");
             defaultUI.UpdateErrorUI(ref errors);
-            return;
+            if (!isConfirmed) return;
         }
 
-        float confirmRemainTime = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-        FastSelectDamageBonus = Mathf.RoundToInt(confirmRemainTime);
-        FastSelectScoreBonus += Mathf.RoundToInt(confirmRemainTime);
+        if (!isConfirmed)
+        {
+            float confirmRemainTime = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
+            FastSelectDamageBonus = Mathf.RoundToInt(confirmRemainTime);
+            FastSelectScoreBonus += Mathf.RoundToInt(confirmRemainTime);
+        }
+        
         Gstate = GameState.Waiting;
+    }
+    void AutoConfirm()
+    {
+        errors.Add("Time over! Confirmed chord selection.");
+        defaultUI.UpdateErrorUI(ref errors);
+
+        isConfirmed = true;
+        ConfirmSelection();
     }
 
     void StartMetronome(double startTime)
@@ -241,22 +255,6 @@ public class BattleManager : MonoBehaviour
         isMetronomeRunning = true;
     }
 
-    /*void InitMusicTiming()
-    {
-        rhythmManager.BeatDuration = 60f / BPM;
-        rhythmManager.MeasureDuration = rhythmManager.BeatDuration * 4f;
-    }
-    void StartGame()
-    {
-        
-        phaseStartTime = AudioSettings.dspTime + 0.1;
-    }
-    void NextPhase(float duration)
-    {
-        phaseStartTime += phaseDuration;
-        phaseDuration = duration;
-    }*/
-
     void StartPreparingPhase()
     {
         defaultUI.UpdateErrorUI(ref errors);
@@ -264,7 +262,6 @@ public class BattleManager : MonoBehaviour
         Gstate = GameState.Preparing;
         defaultUI.UpdatePhaseUI(Gstate);
         rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
-        /*NextPhase(rhythmManager.MeasureDuration * 2);*/
 
         GenerateChoices();
         GenerateChordButtons();
@@ -279,7 +276,6 @@ public class BattleManager : MonoBehaviour
         Gstate = GameState.Selecting;
         defaultUI.UpdatePhaseUI(Gstate);
         rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
-        /*NextPhase(rhythmManager.MeasureDuration * 4);*/
 
         defaultUI.UpdateSelecting(nextChoice, MaxProgressionLength, progression);
     }
@@ -288,7 +284,6 @@ public class BattleManager : MonoBehaviour
         Gstate = GameState.Calculating;
         defaultUI.UpdatePhaseUI(Gstate);
         rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
-        /*NextPhase(rhythmManager.MeasureDuration * 4);*/
 
         sumDamage = BattleCalculator.CalculateDamage(
         progression,
@@ -306,22 +301,6 @@ public class BattleManager : MonoBehaviour
         defaultUI.UpdateErrorUI(ref errors);
 
         ExecuteAction();
-    }
-    /*float GetRemainingTime()
-    {
-        double elapsed = AudioSettings.dspTime - phaseStartTime;
-        float remain = phaseDuration - (float)elapsed;
-
-        return Mathf.Max(0f, remain);
-    }*/
-
-    void AutoConfirm()
-    {
-        errors.Add("Time over! Confirmed chord selection.");
-        defaultUI.UpdateErrorUI(ref errors);
-
-        Gstate = GameState.Waiting;
-        ConfirmSelection();
     }
 
     void GenerateChoices()
