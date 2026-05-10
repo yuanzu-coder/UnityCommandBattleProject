@@ -2,7 +2,7 @@
 
 public enum GameState
 {
-    Start, Preparing, Selecting, Waiting, Calculating, Executing, Result, Finished
+    Start, Loading, Ready, Preparing, Selecting, Waiting, Calculating, Executing, Result, Finished
 }
 
 public enum FinishState

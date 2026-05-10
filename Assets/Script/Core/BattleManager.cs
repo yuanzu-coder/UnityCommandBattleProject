@@ -7,6 +7,7 @@ public class BattleManager : MonoBehaviour
 {
     [SerializeField] DefaultUI defaultUI;
     [SerializeField] TimerUI timerUI;
+    [SerializeField] ChordButtonUI chordButtonUI;
     [SerializeField] RhythmManager rhythmManager;
     [SerializeField] MetronomeManager metronomeManager;
     
@@ -36,12 +37,6 @@ public class BattleManager : MonoBehaviour
     List<Chord> progression = new List<Chord>();
     List<DegreeProgression> DegreeProgressionList = new List<DegreeProgression>();
     List<FProgression> FProgressionList = new List<FProgression>();
-
-    List<Chord> currentChoices = new List<Chord>();
-    Chord nextChoice;
-    public int choiceCount = 5;
-    public GameObject chordButtonPrefab;
-    public Transform chordButtonParent;
 
     bool isConfirmed;
 
@@ -113,7 +108,7 @@ public class BattleManager : MonoBehaviour
         maxTurn,
         currentTurn,
         Gstate,
-        nextChoice,
+        chordButtonUI.nextChoice,
         MaxProgressionLength,
         progression,
         sumDamage,
@@ -138,21 +133,21 @@ public class BattleManager : MonoBehaviour
             defaultUI.UpdateErrorUI(ref errors);
             return;
         }
-        progression.Add(currentChoices[index]);
-        currentChoices.RemoveAt(index);
-        RefillChoices();
-        GenerateChordButtons();
+        progression.Add(chordButtonUI.currentChoices[index]);
+        chordButtonUI.RemoveChoice(index);
+        chordButtonUI.RefillChoices(chords);
+        chordButtonUI.UpdateChordButtons();
 
-        defaultUI.UpdateSelecting(nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateSelecting(chordButtonUI.nextChoice, MaxProgressionLength, progression);
     }
 
-    public void RemoveLastChord()
+    /*public void RemoveLastChord()
     {
         if (Gstate != GameState.Selecting) return;
         if (progression.Count == 0) return;
 
         progression.RemoveAt(progression.Count - 1);
-        defaultUI.UpdateSelecting(nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateSelecting(chordButtonUI.nextChoice, MaxProgressionLength, progression);
         defaultUI.UpdateErrorUI(ref errors);
     }
 
@@ -162,9 +157,9 @@ public class BattleManager : MonoBehaviour
         if (progression.Count == 0) return;
 
         progression.Clear();
-        defaultUI.UpdateSelecting(nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateSelecting(chordButtonUI.nextChoice, MaxProgressionLength, progression);
         defaultUI.UpdateErrorUI(ref errors);
-    }
+    }*/
 
     public void ConfirmSelection()
     {
@@ -203,9 +198,9 @@ public class BattleManager : MonoBehaviour
         defaultUI.UpdatePhaseUI(Gstate);
         rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
 
-        GenerateChoices();
-        GenerateChordButtons();
-        defaultUI.UpdateNextChoiceUI(nextChoice);
+        chordButtonUI.GenerateChoices(chords);
+        chordButtonUI.UpdateChordButtons();
+        defaultUI.UpdateNextChoiceUI(chordButtonUI.nextChoice);
     }
     void StartSelectingPhase()
     {
@@ -218,7 +213,7 @@ public class BattleManager : MonoBehaviour
         defaultUI.UpdatePhaseUI(Gstate);
         rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
 
-        defaultUI.UpdateSelecting(nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateSelecting(chordButtonUI.nextChoice, MaxProgressionLength, progression);
     }
     void StartCalculatingPhase()
     {
@@ -294,76 +289,9 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    void GenerateChoices()
-    {
-        currentChoices.Clear();
-
-        List<Chord> pool = new List<Chord>(chords);
-
-        for (int i = 0; i < choiceCount; i++)
-        {
-            if (pool.Count == 0) break;
-
-            int rand = Random.Range(0, pool.Count);
-            currentChoices.Add(pool[rand]);
-            pool.RemoveAt(rand);
-        }
-
-        if (pool.Count > 0)
-        {
-            nextChoice = pool[Random.Range(0, pool.Count)];
-        }
-        else
-        {
-            nextChoice = null;
-        }
-    }
-
-    void GenerateChordButtons()
-    {
-        // 既存ボタン削除
-        foreach (Transform child in chordButtonParent)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // 新規生成
-        for (int i = 0; i < currentChoices.Count; i++)
-        {
-            int index = i;
-
-            GameObject btn = Instantiate(chordButtonPrefab, chordButtonParent);
-
-            // テキスト設定
-            var text = btn.GetComponentInChildren<TextMeshProUGUI>();
-            text.text = currentChoices[i].name;
-
-            // ボタンイベント設定
-            btn.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
-            {
-                SelectChord(index);
-            });
-        }
-    }
-
-    void RefillChoices()
-    {   
-        if(nextChoice != null) currentChoices.Add(nextChoice);
-
-        List<Chord> pool = chords.Except(currentChoices).ToList();
-        if (pool.Count > 0)
-        {
-            nextChoice = pool[Random.Range(0, pool.Count)];
-        }
-        else
-        {
-            nextChoice = null;
-        }
-    }
-
     void HandleNumberInput()
     {
-        for (int i = 0; i < currentChoices.Count; i++)
+        for (int i = 0; i < chordButtonUI.currentChoices.Count; i++)
         {
             // Alpha1〜Alpha5（上の数字キー）
             if (Input.GetKeyDown(KeyCode.Alpha1 + i) ||
