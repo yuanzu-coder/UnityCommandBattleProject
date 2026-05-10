@@ -46,13 +46,23 @@ public class RhythmManager : MonoBehaviour
         GameState Gstate
     )
     {
-        int measureNum;
-        if(Gstate == GameState.Preparing) measureNum = 2;
-        else if(Gstate == GameState.Selecting) measureNum = 4;
-        else if(Gstate == GameState.Calculating) measureNum = 4;
-        else measureNum = 0;
+        int measureNum = 0;
+        switch (Gstate)
+        {
+            case GameState.Preparing: 
+                measureNum = 2;
+                break;
+            
+            case GameState.Selecting:
+                measureNum = 4;
+                break;
+                
+            case GameState.Calculating:
+                measureNum = 4;
+                break;
+        }
 
-        return MeasureDuration * measureNum;
+        return measureNum;
     }
 
     public void NextPhase(

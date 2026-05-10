@@ -27,9 +27,6 @@ public class BattleManager : MonoBehaviour
 
     List<string> errors = new List<string>();
 
-    public TextMeshProUGUI countDownText;
-    public TextMeshProUGUI beatText;
-
     public UnityEngine.UI.Button confirmButton;
 
     List<Chord> chords = new List<Chord>();
@@ -71,64 +68,29 @@ public class BattleManager : MonoBehaviour
     {
         metronomeManager.PlayMetronome();
 
-        if (rhythmManager.CurrentDSPTime < phaseStartTime)
-        {
-            return;
-        }
+        if (rhythmManager.CurrentDSPTime < phaseStartTime) return;
 
-        if (Gstate == GameState.Start)
+        switch (Gstate)
         {
-            NextTurn();
-        }
-        else if (Gstate == GameState.Preparing)
-        {
-            float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-            rhythmManager.CalcCountDown(phaseStartTime, phaseDuration, Gstate);
-            timerUI.UpdateCountDownUI(3);
+            case GameState.Start:
+                NextTurn();
+                break;
 
-            if (remain <= 0f)
-            {
-                countDownText.text = "";
-                StartSelectingPhase();
-            }
-        }
-        else if (Gstate == GameState.Selecting)
-        {
-            float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-            rhythmManager.CalcBeat(phaseStartTime);
-            timerUI.UpdateBeatUI();
+            case GameState.Preparing:
+                UpdatePreparing();
+                break;
 
-            if (remain <= 0f)
-            {
-                AutoConfirm();
-            }
+            case GameState.Selecting:
+                UpdateSelecting();
+                break;
 
-            HandleNumberInput();
-            ConfirmSpace();
-        }
-        else if (Gstate == GameState.Waiting)
-        {
-            float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-            rhythmManager.CalcBeat(phaseStartTime);
-            timerUI.UpdateBeatUI();
+            case GameState.Waiting:
+                UpdateWaiting();
+                break;
 
-            if (remain <= 0f)
-            {
-                beatText.text = "";
-                StartCalculatingPhase();
-            }
-        }
-        else if (Gstate == GameState.Calculating)
-        {
-            float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
-            rhythmManager.CalcBeat(phaseStartTime);
-            timerUI.UpdateBeatUI();
-
-            if (remain <= 0f)
-            {
-                beatText.text = "";
-                StartExecutingPhase();
-            }
+            case GameState.Calculating:
+                UpdateCalculating();
+                break;
         }
     }
 
@@ -145,9 +107,6 @@ public class BattleManager : MonoBehaviour
         sumDamage = 0;
 
         isConfirmed = false;
-
-        countDownText.text = "";
-        beatText.text = "";
         
         defaultUI.UpdateAllUI(
         key,
@@ -163,6 +122,9 @@ public class BattleManager : MonoBehaviour
         finalScore,
         Fstate,
         ref errors);
+
+        timerUI.HideCountDownUI();
+        timerUI.HideBeatUI();
 
         rhythmManager.SetGameStartTime(ref phaseStartTime);
         metronomeManager.StartMetronome(phaseStartTime);
@@ -247,6 +209,7 @@ public class BattleManager : MonoBehaviour
     }
     void StartSelectingPhase()
     {
+        timerUI.HideCountDownUI();
         defaultUI.UpdateDamageUI(sumDamage, Gstate);
         defaultUI.UpdateModifierUI(modifier, Gstate);
         defaultUI.UpdateErrorUI(ref errors);
@@ -274,11 +237,61 @@ public class BattleManager : MonoBehaviour
     }
     void StartExecutingPhase()
     {
-        Gstate = GameState.Executing;
-        defaultUI.UpdatePhaseUI(Gstate);
+        timerUI.HideBeatUI();
         defaultUI.UpdateErrorUI(ref errors);
 
+        Gstate = GameState.Executing;
+        defaultUI.UpdatePhaseUI(Gstate);
+
         ExecuteAction();
+    }
+
+    void UpdatePreparing()
+    {
+        float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
+        rhythmManager.CalcCountDown(phaseStartTime, phaseDuration, Gstate);
+        timerUI.UpdateCountDownUI(3);
+
+        if (remain <= 0f)
+        {
+            StartSelectingPhase();
+        }
+    }
+    void UpdateSelecting()
+    {
+        float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
+        rhythmManager.CalcBeat(phaseStartTime);
+        timerUI.UpdateBeatUI();
+
+        if (remain <= 0f)
+        {
+            AutoConfirm();
+        }
+
+        HandleNumberInput();
+        ConfirmSpace();
+    }
+    void UpdateWaiting()
+    {
+        float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
+        rhythmManager.CalcBeat(phaseStartTime);
+        timerUI.UpdateBeatUI();
+
+        if (remain <= 0f)
+        {
+            StartCalculatingPhase();
+        }
+    }
+    void UpdateCalculating()
+    {
+        float remain = rhythmManager.GetRemainingTime(phaseStartTime, phaseDuration);
+        rhythmManager.CalcBeat(phaseStartTime);
+        timerUI.UpdateBeatUI();
+
+        if (remain <= 0f)
+        {
+            StartExecutingPhase();
+        }
     }
 
     void GenerateChoices()

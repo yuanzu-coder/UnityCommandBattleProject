@@ -93,10 +93,24 @@ public class DefaultUI : MonoBehaviour
         GameState Gstate
     )
     {
-        phaseText.text = ""; 
-        if (Gstate == GameState.Selecting || Gstate == GameState.Waiting) phaseText.text = "Composing";
-        else if (Gstate == GameState.Calculating) phaseText.text = "Playing";
-        else if (Gstate == GameState.Preparing) phaseText.text = "Preparing";
+        string phase = "";
+        switch (Gstate)
+        {
+            case GameState.Preparing: 
+                phase = "Composing";
+                break;
+            
+            case GameState.Selecting:
+            case GameState.Waiting:
+                phase = "Playing";
+                break;
+                
+            case GameState.Calculating:
+                phase = "Preparing";
+                break;
+        }
+
+        phaseText.text = phase;
     }
 
     public void UpdateNextChoiceUI(

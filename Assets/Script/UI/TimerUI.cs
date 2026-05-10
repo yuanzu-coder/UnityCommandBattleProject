@@ -21,4 +21,13 @@ public class TimerUI : MonoBehaviour
     {
         beatText.text = $"{rhythmManager.CurrentMeasure}:  {rhythmManager.BeatInMeasure}";
     }
+
+    public void HideCountDownUI()
+    {
+        countDownText.text = "";
+    }
+    public void HideBeatUI()
+    {
+        beatText.text = "";
+    }
 }
