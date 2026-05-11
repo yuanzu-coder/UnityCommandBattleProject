@@ -3,20 +3,20 @@ public class FProgression
 {
     public string name;
     public ChordFunction[] pattern;
-    public int damage;
+    public float multiplier;
 }
 public class DegreeProgression
 {
     public string name;
     public Degree[] pattern;
-    public int Multiplier()
+    public int AddDamage()
     {
         switch (pattern.Length)
         {
-            case 8: return 7;
-            case 4: return 5;
-            case 3: return 4;
-            default: return 2;
+            case 8: return 300;
+            case 4: return 100;
+            case 3: return 50;
+            default: return 0;
         }
     }
 }

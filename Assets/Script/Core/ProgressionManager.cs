@@ -83,21 +83,39 @@ public static class ProgressionManager
         {
             new FProgression
             {
-                name = "SD-D-T",
-                pattern = new [] { ChordFunction.SD, ChordFunction.D, ChordFunction.T },
-                damage = 80
+                name = "Dominant Motion (D-T)",
+                pattern = new [] { ChordFunction.D, ChordFunction.T },
+                multiplier = 0.5f
             },
             new FProgression
             {
-                name = "Deceptive Cadence (to D)",
+                name = "Deceptive Cadence (D-D)",
                 pattern = new [] { ChordFunction.D, ChordFunction.D },
-                damage = 40
+                multiplier = 0.3f
             },
             new FProgression
             {
-                name = "Deceptive Cadence (to SD)",
+                name = "Deceptive Cadence (D-SD)",
                 pattern = new [] { ChordFunction.D, ChordFunction.SD },
-                damage = 40
+                multiplier = 0.3f
+            },
+            new FProgression
+            {
+                name = "Plagal Cadence (SD-T)",
+                pattern = new [] { ChordFunction.SD, ChordFunction.T },
+                multiplier = 0.4f
+            },
+            new FProgression
+            {
+                name = "T-SD",
+                pattern = new [] { ChordFunction.T, ChordFunction.SD },
+                multiplier = 0.2f
+            },
+            new FProgression
+            {
+                name = "SD-D",
+                pattern = new [] { ChordFunction.SD, ChordFunction.D },
+                multiplier = 0.2f
             }
         };
 
