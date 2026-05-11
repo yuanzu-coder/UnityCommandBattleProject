@@ -8,6 +8,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] DefaultUI defaultUI;
     [SerializeField] TimerUI timerUI;
     [SerializeField] ChordButtonUI chordButtonUI;
+    [SerializeField] ChoiceManager choiceManager;
     [SerializeField] RhythmManager rhythmManager;
     [SerializeField] MetronomeManager metronomeManager;
     
@@ -108,7 +109,7 @@ public class BattleManager : MonoBehaviour
         maxTurn,
         currentTurn,
         Gstate,
-        chordButtonUI.nextChoice,
+        choiceManager.nextChoice,
         MaxProgressionLength,
         progression,
         sumDamage,
@@ -133,12 +134,12 @@ public class BattleManager : MonoBehaviour
             defaultUI.UpdateErrorUI(ref errors);
             return;
         }
-        progression.Add(chordButtonUI.currentChoices[index]);
-        chordButtonUI.RemoveChoice(index);
-        chordButtonUI.RefillChoices(chords);
+        progression.Add(choiceManager.CurrentChoices[index]);
+        choiceManager.RemoveChoice(index);
+        choiceManager.RefillChoices(chords);
         chordButtonUI.UpdateChordButtons();
 
-        defaultUI.UpdateSelecting(chordButtonUI.nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateSelecting(choiceManager.nextChoice, MaxProgressionLength, progression);
     }
 
     /*public void RemoveLastChord()
@@ -147,7 +148,7 @@ public class BattleManager : MonoBehaviour
         if (progression.Count == 0) return;
 
         progression.RemoveAt(progression.Count - 1);
-        defaultUI.UpdateSelecting(chordButtonUI.nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateSelecting(choiceManager.nextChoice, MaxProgressionLength, progression);
         defaultUI.UpdateErrorUI(ref errors);
     }
 
@@ -157,7 +158,7 @@ public class BattleManager : MonoBehaviour
         if (progression.Count == 0) return;
 
         progression.Clear();
-        defaultUI.UpdateSelecting(chordButtonUI.nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateSelecting(choiceManager.nextChoice, MaxProgressionLength, progression);
         defaultUI.UpdateErrorUI(ref errors);
     }*/
 
@@ -198,9 +199,9 @@ public class BattleManager : MonoBehaviour
         defaultUI.UpdatePhaseUI(Gstate);
         rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
 
-        chordButtonUI.GenerateChoices(chords);
+        choiceManager.GenerateChoices(chords);
         chordButtonUI.UpdateChordButtons();
-        defaultUI.UpdateNextChoiceUI(chordButtonUI.nextChoice);
+        defaultUI.UpdateNextChoiceUI(choiceManager.nextChoice);
     }
     void StartSelectingPhase()
     {
@@ -213,7 +214,7 @@ public class BattleManager : MonoBehaviour
         defaultUI.UpdatePhaseUI(Gstate);
         rhythmManager.NextPhase(ref phaseStartTime, ref phaseDuration, Gstate);
 
-        defaultUI.UpdateSelecting(chordButtonUI.nextChoice, MaxProgressionLength, progression);
+        defaultUI.UpdateSelecting(choiceManager.nextChoice, MaxProgressionLength, progression);
     }
     void StartCalculatingPhase()
     {
@@ -291,7 +292,7 @@ public class BattleManager : MonoBehaviour
 
     void HandleNumberInput()
     {
-        for (int i = 0; i < chordButtonUI.currentChoices.Count; i++)
+        for (int i = 0; i < choiceManager.CurrentChoices.Count; i++)
         {
             // Alpha1〜Alpha5（上の数字キー）
             if (Input.GetKeyDown(KeyCode.Alpha1 + i) ||

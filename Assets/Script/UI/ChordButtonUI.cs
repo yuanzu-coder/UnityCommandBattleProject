@@ -6,41 +6,10 @@ using System.Linq;
 public class ChordButtonUI : MonoBehaviour
 {
     [SerializeField] BattleManager battleManager;
-
-    public List<Chord> currentChoices = new List<Chord>();
-    public Chord nextChoice {get; private set;}
-    int choiceCount = 5;
+    [SerializeField] ChoiceManager choiceManager;
 
     public GameObject chordButtonPrefab;
     public Transform chordButtonParent;
-
-    public void GenerateChoices(
-        List<Chord> chords
-    )
-    {
-        currentChoices.Clear();
-
-        List<Chord> pool = new List<Chord> (chords);
-
-
-        for (int i = 0; i < choiceCount; i++)
-        {
-            if (pool.Count == 0) break;
-
-            int rand = Random.Range(0, pool.Count);
-            currentChoices.Add(pool[rand]);
-            pool.RemoveAt(rand);
-        }
-
-        if (pool.Count > 0)
-        {
-            nextChoice = pool[Random.Range(0, pool.Count)];
-        }
-        else
-        {
-            nextChoice = null;
-        }
-    }
 
     public void UpdateChordButtons()
     {
@@ -51,7 +20,7 @@ public class ChordButtonUI : MonoBehaviour
         }
 
         // 新規生成
-        for (int i = 0; i < currentChoices.Count; i++)
+        for (int i = 0; i < choiceManager.CurrentChoices.Count; i++)
         {
             int index = i;
 
@@ -59,7 +28,7 @@ public class ChordButtonUI : MonoBehaviour
 
             // テキスト設定
             var text = btn.GetComponentInChildren<TextMeshProUGUI>();
-            text.text = currentChoices[i].name;
+            text.text = choiceManager.CurrentChoices[i].name;
 
             // ボタンイベント設定
             btn.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
@@ -68,28 +37,5 @@ public class ChordButtonUI : MonoBehaviour
             });
         }
     }
-
-    public void RemoveChoice(
-        int index
-    )
-    {
-        currentChoices.RemoveAt(index);
-    }
-
-    public void RefillChoices(
-        List<Chord> chords
-    )
-    {   
-        if(nextChoice != null) currentChoices.Add(nextChoice);
-
-        List<Chord> pool = new List<Chord> (chords.Except(currentChoices).ToList());
-        if (pool.Count > 0)
-        {
-            nextChoice = pool[Random.Range(0, pool.Count)];
-        }
-        else
-        {
-            nextChoice = null;
-        }
-    }
 }
+    
